@@ -27,6 +27,7 @@ NEXT_GAME_FILE = "next_game.csv"
 RESULTS_FILE = "results.csv"
 PLAYERS_FILE = "players.csv"
 LOGO_FILE = "logo.png"
+IMAGES_DIR = Path("images")
 
 # -------------------------------------------------
 # Helpers
@@ -133,11 +134,16 @@ def enrich_players(df: pd.DataFrame) -> pd.DataFrame:
     required_cols = ["number", "name", "position"]
     missing = [col for col in required_cols if col not in df.columns]
     if missing:
-        return pd.DataFrame(columns=required_cols)
+        return pd.DataFrame(columns=["number", "name", "position", "photo"])
+
+    if "photo" not in df.columns:
+        df["photo"] = ""
 
     df["number"] = df["number"].astype(str).str.strip()
     df["name"] = df["name"].astype(str).str.strip()
     df["position"] = df["position"].astype(str).str.strip()
+    df["photo"] = df["photo"].fillna("").astype(str).str.strip()
+
     return df
 
 
@@ -577,6 +583,69 @@ st.markdown(
             grid-template-columns: 1fr;
         }
     }
+    .player-photo-wrap {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 0.85rem;
+    }
+    
+    .player-photo {
+        width: 110px;
+        height: 110px;
+        object-fit: cover;
+        border-radius: 18px;
+        border: 1px solid #243244;
+        display: block;
+    }
+    
+    .player-photo-placeholder {
+        width: 110px;
+        height: 110px;
+        border-radius: 18px;
+        border: 1px solid #243244;
+        background: linear-gradient(180deg, #0d141d 0%, #111a26 100%);
+        color: #ff7a00;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        font-weight: 900;
+    }
+    
+    .player-card {
+        background: linear-gradient(180deg, #101722 0%, #0c1119 100%);
+        border: 1px solid #1e2937;
+        border-radius: 22px;
+        padding: 1rem;
+        box-shadow: 0 10px 28px rgba(0,0,0,0.28);
+        text-align: center;
+    }
+    
+    .player-number {
+        color: #ff7a00;
+        font-size: 1.5rem;
+        font-weight: 900;
+        margin-bottom: 0.35rem;
+    }
+    
+    .player-name {
+        color: #ffffff;
+        font-size: 1.05rem;
+        font-weight: 800;
+        margin-bottom: 0.25rem;
+    }
+    
+    .player-position {
+        color: #94a3b8;
+        font-size: 0.95rem;
+    }
+    @media (max-width: 640px) {
+        .player-photo,
+        .player-photo-placeholder {
+            width: 96px;
+            height: 96px;
+        }
+    }
     </style>
     """,
     unsafe_allow_html=True,
@@ -788,11 +857,41 @@ if not players_df.empty:
     players_html = '<div class="players-grid">'
 
     for _, row in players_df.iterrows():
-        players_html += f"""<div class="player-card">
-<div class="player-number">#{esc(row['number'])}</div>
-<div class="player-name">{esc(row['name'])}</div>
-<div class="player-position">{esc(row['position'])}</div>
-</div>"""
+        photo_name = str(row.get("photo", "")).strip()
+        photo_html = ""
+
+        if photo_name:
+            photo_path = IMAGES_DIR / photo_name
+            if photo_path.exists():
+                img_b64 = base64.b64encode(photo_path.read_bytes()).decode()
+                ext = photo_path.suffix.lower().replace(".", "")
+                if ext == "jpg":
+                    ext = "jpeg"
+                if ext not in ["jpeg", "png", "webp"]:
+                    ext = "jpeg"
+
+                photo_html = f"""
+<div class="player-photo-wrap">
+    <img src="data:image/{ext};base64,{img_b64}" class="player-photo">
+</div>
+"""
+        
+        if not photo_html:
+            initials = "".join([part[0] for part in str(row["name"]).split()[:2]]).upper()
+            photo_html = f"""
+<div class="player-photo-wrap">
+    <div class="player-photo-placeholder">{esc(initials)}</div>
+</div>
+"""
+
+        players_html += f"""
+<div class="player-card">
+    {photo_html}
+    <div class="player-number">#{esc(row['number'])}</div>
+    <div class="player-name">{esc(row['name'])}</div>
+    <div class="player-position">{esc(row['position'])}</div>
+</div>
+"""
 
     players_html += "</div>"
     st.markdown(players_html, unsafe_allow_html=True)
