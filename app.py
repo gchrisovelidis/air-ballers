@@ -25,6 +25,7 @@ TIMEZONE = ZoneInfo("Europe/Athens")
 
 NEXT_GAME_FILE = "next_game.csv"
 RESULTS_FILE = "results.csv"
+PLAYERS_FILE = "players.csv"
 LOGO_FILE = "logo.png"
 
 # -------------------------------------------------
@@ -92,9 +93,13 @@ def enrich_results(df: pd.DataFrame) -> pd.DataFrame:
     if missing:
         return pd.DataFrame(columns=required_cols + ["result", "score_display"])
 
+    if "youtube_url" not in df.columns:
+        df["youtube_url"] = ""
+
     df["team_score"] = pd.to_numeric(df["team_score"], errors="coerce")
     df["opponent_score"] = pd.to_numeric(df["opponent_score"], errors="coerce")
     df["date"] = pd.to_datetime(df["date"], errors="coerce", dayfirst=True)
+    df["youtube_url"] = df["youtube_url"].fillna("").astype(str).str.strip()
 
     df = df.dropna(subset=["date", "team_score", "opponent_score"])
 
@@ -109,6 +114,24 @@ def enrich_results(df: pd.DataFrame) -> pd.DataFrame:
     )
 
     df = df.sort_values("date", ascending=False).reset_index(drop=True)
+    return df
+
+
+def enrich_players(df: pd.DataFrame) -> pd.DataFrame:
+    if df.empty:
+        return df
+
+    df = df.copy()
+    df.columns = [str(c).strip().replace("\ufeff", "") for c in df.columns]
+
+    required_cols = ["number", "name", "position"]
+    missing = [col for col in required_cols if col not in df.columns]
+    if missing:
+        return pd.DataFrame(columns=required_cols)
+
+    df["number"] = df["number"].astype(str).str.strip()
+    df["name"] = df["name"].astype(str).str.strip()
+    df["position"] = df["position"].astype(str).str.strip()
     return df
 
 
@@ -175,11 +198,15 @@ next_game_df = load_csv_safe(
     NEXT_GAME_FILE, ["opponent", "date", "time", "venue", "home_away"]
 )
 results_df = load_csv_safe(
-    RESULTS_FILE, ["date", "opponent", "team_score", "opponent_score"]
+    RESULTS_FILE, ["date", "opponent", "team_score", "opponent_score", "youtube_url"]
+)
+players_df = load_csv_safe(
+    PLAYERS_FILE, ["number", "name", "position"]
 )
 
 next_game = parse_next_game(next_game_df)
 results_df = enrich_results(results_df)
+players_df = enrich_players(players_df)
 last_result = get_last_result(results_df)
 streak = get_streak(results_df)
 
@@ -399,6 +426,60 @@ st.markdown(
         font-weight: 900;
     }
 
+    .watch-link {
+        display: inline-block;
+        margin-top: 0.8rem;
+        padding: 0.55rem 0.95rem;
+        border-radius: 999px;
+        background: rgba(255, 122, 0, 0.16);
+        color: #ff9d3d !important;
+        text-decoration: none !important;
+        font-weight: 800;
+        font-size: 0.9rem;
+        border: 1px solid rgba(255, 122, 0, 0.28);
+    }
+
+    .watch-link:hover {
+        background: rgba(255, 122, 0, 0.24);
+        color: #ffb866 !important;
+        text-decoration: none !important;
+    }
+
+    .players-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.9rem;
+        margin-top: 0.2rem;
+    }
+
+    .player-card {
+        background: linear-gradient(180deg, #101722 0%, #0c1119 100%);
+        border: 1px solid #1e2937;
+        border-radius: 22px;
+        padding: 1rem;
+        box-shadow: 0 10px 28px rgba(0,0,0,0.28);
+        text-align: center;
+    }
+
+    .player-number {
+        color: #ff7a00;
+        font-size: 1.5rem;
+        font-weight: 900;
+        margin-bottom: 0.35rem;
+    }
+
+    .player-name {
+        color: #ffffff;
+        font-size: 1.05rem;
+        font-weight: 800;
+        margin-bottom: 0.25rem;
+    }
+
+    .player-position {
+        color: #94a3b8;
+        font-size: 0.95rem;
+    }
+
     .empty-box {
         background: linear-gradient(180deg, #101722 0%, #0c1119 100%);
         border: 1px dashed #334155;
@@ -422,6 +503,10 @@ st.markdown(
 
         .count-num {
             font-size: 2.1rem;
+        }
+
+        .players-grid {
+            grid-template-columns: repeat(2, 1fr);
         }
     }
 
@@ -457,6 +542,10 @@ st.markdown(
 
         .card {
             min-height: auto;
+        }
+
+        .players-grid {
+            grid-template-columns: 1fr;
         }
     }
     </style>
@@ -627,6 +716,10 @@ if not results_df.empty:
         result_word = "Win" if row["result"] == "W" else "Loss"
         date_str = row["date"].strftime("%d %b %Y")
 
+        watch_html = ""
+        if row["youtube_url"]:
+            watch_html = f'<a href="{esc(row["youtube_url"])}" target="_blank" class="watch-link">Watch Game</a>'
+
         results_html += f"""<div class="result-card">
 <div class="result-top">
 <div class="result-opponent">vs {esc(row['opponent'])}</div>
@@ -636,6 +729,7 @@ if not results_df.empty:
 <div class="{result_class}">{result_word}</div>
 <div class="result-score">{esc(row['score_display'])}</div>
 </div>
+{watch_html}
 </div>"""
 
     results_html += "</div>"
@@ -645,6 +739,33 @@ else:
         """
 <div class="empty-box">
 No previous results found. Update results.csv.
+</div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+# -------------------------------------------------
+# Players
+# -------------------------------------------------
+st.markdown('<div class="section-heading">Players</div>', unsafe_allow_html=True)
+
+if not players_df.empty:
+    players_html = '<div class="players-grid">'
+
+    for _, row in players_df.iterrows():
+        players_html += f"""<div class="player-card">
+<div class="player-number">#{esc(row['number'])}</div>
+<div class="player-name">{esc(row['name'])}</div>
+<div class="player-position">{esc(row['position'])}</div>
+</div>"""
+
+    players_html += "</div>"
+    st.markdown(players_html, unsafe_allow_html=True)
+else:
+    st.markdown(
+        """
+<div class="empty-box">
+No players found. Update players.csv.
 </div>
         """,
         unsafe_allow_html=True,
