@@ -23,7 +23,6 @@ TIMEZONE = ZoneInfo("Europe/Athens")
 
 NEXT_GAME_FILE = "next_game.csv"
 RESULTS_FILE = "results.csv"
-ROSTER_FILE = "roster.csv"
 LOGO_FILE = "logo.png"  # optional
 
 # -------------------------------------------------
@@ -169,9 +168,6 @@ next_game_df = load_csv_safe(
 results_df = load_csv_safe(
     RESULTS_FILE, ["date", "opponent", "team_score", "opponent_score"]
 )
-roster_df = load_csv_safe(
-    ROSTER_FILE, ["number", "name", "position"]
-)
 
 next_game = parse_next_game(next_game_df)
 results_df = enrich_results(results_df)
@@ -179,7 +175,7 @@ last_result = get_last_result(results_df)
 streak = get_streak(results_df)
 
 # -------------------------------------------------
-# Optional auto refresh every 60 seconds
+# Auto refresh every 60 seconds
 # -------------------------------------------------
 st.markdown(
     """
@@ -199,11 +195,11 @@ st.markdown(
     footer {visibility: hidden;}
 
     .block-container {
-        padding-top: 1.2rem;
+        padding-top: 1rem;
         padding-bottom: 2rem;
-        padding-left: 1rem;
-        padding-right: 1rem;
-        max-width: 1200px;
+        padding-left: 0.8rem;
+        padding-right: 0.8rem;
+        max-width: 1150px;
     }
 
     html, body, [class*="css"] {
@@ -212,41 +208,33 @@ st.markdown(
 
     .app-bg {
         background: linear-gradient(180deg, #0f1115 0%, #171b22 100%);
-        border-radius: 24px;
-        padding: 1.2rem;
+        border-radius: 22px;
+        padding: 1rem;
     }
 
     .hero {
         text-align: center;
-        padding: 0.8rem 0 1.2rem 0;
-    }
-
-    .hero-logo {
-        max-width: 110px;
-        width: 100%;
-        margin: 0 auto 0.7rem auto;
-        display: block;
+        padding: 0.4rem 0 1rem 0;
     }
 
     .hero-title {
         color: white;
-        font-size: 2.1rem;
-        font-weight: 800;
+        font-size: 2rem;
+        font-weight: 900;
         line-height: 1.1;
-        margin-bottom: 0.3rem;
+        margin-bottom: 0.2rem;
     }
 
     .hero-subtitle {
         color: #b9c0cc;
-        font-size: 1rem;
-        margin-bottom: 0.2rem;
+        font-size: 0.98rem;
     }
 
     .section-title {
         color: white;
-        font-size: 1.25rem;
+        font-size: 1.2rem;
         font-weight: 800;
-        margin: 1.2rem 0 0.9rem 0;
+        margin: 1.1rem 0 0.8rem 0;
     }
 
     .stat-card {
@@ -255,29 +243,29 @@ st.markdown(
         border-radius: 20px;
         padding: 1rem;
         color: white;
-        min-height: 140px;
+        min-height: 145px;
         box-shadow: 0 8px 22px rgba(0,0,0,0.18);
     }
 
     .stat-label {
         color: #aab4c3;
-        font-size: 0.85rem;
-        font-weight: 700;
+        font-size: 0.82rem;
+        font-weight: 800;
         text-transform: uppercase;
-        letter-spacing: 0.04em;
-        margin-bottom: 0.7rem;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.65rem;
     }
 
     .stat-value {
         color: white;
-        font-size: 1.5rem;
-        font-weight: 800;
+        font-size: 1.45rem;
+        font-weight: 900;
         line-height: 1.2;
     }
 
     .stat-sub {
         color: #c6ced8;
-        font-size: 0.95rem;
+        font-size: 0.93rem;
         margin-top: 0.45rem;
         line-height: 1.4;
     }
@@ -286,8 +274,8 @@ st.markdown(
         background: #1d232d;
         border: 1px solid #2a3340;
         border-radius: 24px;
-        padding: 1.2rem;
-        margin-top: 0.4rem;
+        padding: 1rem;
+        margin-top: 0.35rem;
     }
 
     .countdown-grid {
@@ -313,7 +301,7 @@ st.markdown(
 
     .countdown-label {
         color: #b7c0cb;
-        font-size: 0.9rem;
+        font-size: 0.88rem;
         margin-top: 0.35rem;
         text-transform: uppercase;
         letter-spacing: 0.04em;
@@ -341,7 +329,7 @@ st.markdown(
     }
 
     .result-opponent {
-        font-size: 1.05rem;
+        font-size: 1.02rem;
         font-weight: 800;
     }
 
@@ -354,7 +342,7 @@ st.markdown(
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-top: 0.5rem;
+        margin-top: 0.55rem;
         flex-wrap: wrap;
         gap: 0.6rem;
     }
@@ -362,7 +350,7 @@ st.markdown(
     .badge-win, .badge-loss {
         padding: 0.35rem 0.7rem;
         border-radius: 999px;
-        font-size: 0.85rem;
+        font-size: 0.84rem;
         font-weight: 800;
         display: inline-block;
     }
@@ -382,38 +370,6 @@ st.markdown(
         font-weight: 800;
     }
 
-    .roster-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 0.8rem;
-    }
-
-    .player-card {
-        background: #1d232d;
-        border: 1px solid #2a3340;
-        border-radius: 18px;
-        padding: 0.95rem;
-        color: white;
-    }
-
-    .player-number {
-        color: #ff7a00;
-        font-size: 1.1rem;
-        font-weight: 900;
-        margin-bottom: 0.25rem;
-    }
-
-    .player-name {
-        font-size: 1rem;
-        font-weight: 800;
-        margin-bottom: 0.25rem;
-    }
-
-    .player-pos {
-        color: #b7c0cb;
-        font-size: 0.92rem;
-    }
-
     .empty-box {
         background: #1d232d;
         border: 1px dashed #3a4655;
@@ -424,46 +380,43 @@ st.markdown(
 
     @media (max-width: 900px) {
         .hero-title {
-            font-size: 1.75rem;
+            font-size: 1.7rem;
         }
 
         .countdown-number {
             font-size: 1.6rem;
         }
-
-        .roster-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
     }
 
     @media (max-width: 640px) {
         .block-container {
-            padding-left: 0.7rem;
-            padding-right: 0.7rem;
+            padding-left: 0.55rem;
+            padding-right: 0.55rem;
+        }
+
+        .app-bg {
+            padding: 0.8rem;
+            border-radius: 18px;
         }
 
         .hero-title {
-            font-size: 1.55rem;
+            font-size: 1.45rem;
         }
 
         .hero-subtitle {
-            font-size: 0.92rem;
+            font-size: 0.9rem;
         }
 
         .countdown-grid {
             grid-template-columns: 1fr;
         }
 
-        .roster-grid {
-            grid-template-columns: 1fr;
-        }
-
         .stat-value {
-            font-size: 1.25rem;
+            font-size: 1.2rem;
         }
 
         .countdown-number {
-            font-size: 1.5rem;
+            font-size: 1.45rem;
         }
     }
     </style>
@@ -479,13 +432,8 @@ st.markdown('<div class="app-bg">', unsafe_allow_html=True)
 # -------------------------------------------------
 # Hero
 # -------------------------------------------------
-logo_html = ""
 if Path(LOGO_FILE).exists():
-    logo_html = f'<img src="data:image/png;base64,{Path(LOGO_FILE).read_bytes().hex()}" class="hero-logo">'
-
-# Safer alternative: use st.image for rendering logo
-if Path(LOGO_FILE).exists():
-    st.image(LOGO_FILE, width=110)
+    st.image(LOGO_FILE, width=100)
 
 st.markdown(
     f"""
@@ -521,15 +469,13 @@ with col1:
             <div class="stat-card">
                 <div class="stat-label">Next Game</div>
                 <div class="stat-value">Not set</div>
-                <div class="stat-sub">Add one row in next_game.csv</div>
+                <div class="stat-sub">Check next_game.csv</div>
             </div>
             """,
             unsafe_allow_html=True
         )
 
 with col2:
-    streak_class = "white"
-    streak_sub = ""
     if streak["type"] == "win":
         streak_sub = "Team is on a hot run"
     elif streak["type"] == "loss":
@@ -557,9 +503,7 @@ with col3:
             <div class="stat-card">
                 <div class="stat-label">Last Result</div>
                 <div class="stat-value">vs {last_result['opponent']}</div>
-                <div class="stat-sub">
-                    <span class="{badge_class}">{result_word}</span>
-                </div>
+                <div class="stat-sub"><span class="{badge_class}">{result_word}</span></div>
                 <div class="stat-sub">{last_result['score']}</div>
             </div>
             """,
@@ -571,7 +515,7 @@ with col3:
             <div class="stat-card">
                 <div class="stat-label">Last Result</div>
                 <div class="stat-value">No games yet</div>
-                <div class="stat-sub">Add rows in results.csv</div>
+                <div class="stat-sub">Check results.csv</div>
             </div>
             """,
             unsafe_allow_html=True
@@ -619,7 +563,7 @@ else:
     st.markdown(
         """
         <div class="empty-box">
-            No next game found. Add one row to next_game.csv.
+            No next game found. Check next_game.csv.
         </div>
         """,
         unsafe_allow_html=True
@@ -658,38 +602,7 @@ else:
     st.markdown(
         """
         <div class="empty-box">
-            No previous results found. Add rows to results.csv.
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-# -------------------------------------------------
-# Roster
-# -------------------------------------------------
-st.markdown('<div class="section-title">Roster</div>', unsafe_allow_html=True)
-
-if not roster_df.empty:
-    roster_html = '<div class="roster-grid">'
-    for _, row in roster_df.iterrows():
-        number = row.get("number", "")
-        name = row.get("name", "Player")
-        position = row.get("position", "")
-
-        roster_html += f"""
-        <div class="player-card">
-            <div class="player-number">#{number}</div>
-            <div class="player-name">{name}</div>
-            <div class="player-pos">{position}</div>
-        </div>
-        """
-    roster_html += "</div>"
-    st.markdown(roster_html, unsafe_allow_html=True)
-else:
-    st.markdown(
-        """
-        <div class="empty-box">
-            No roster found. Add rows to roster.csv.
+            No previous results found. Check results.csv.
         </div>
         """,
         unsafe_allow_html=True
