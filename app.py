@@ -239,7 +239,6 @@ streak = get_streak(results_df)
 st.markdown(
     """
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Oswald:wght@400;500;600;700&display=swap');
 
     #MainMenu {visibility: hidden;}
     header {visibility: hidden;}
@@ -248,7 +247,7 @@ st.markdown(
     html, body, [data-testid="stAppViewContainer"], .stApp {
         background: #05070b !important;
         color: white !important;
-        font-family: 'Inter', sans-serif !important;
+        font-family: Arial, Helvetica, sans-serif !important;
     }
 
     [data-testid="stAppViewContainer"] > .main {
@@ -286,7 +285,7 @@ st.markdown(
 
     .hero-title {
         color: #ffffff;
-        font-family: 'Oswald', sans-serif;
+        font-family: Impact, Arial Black, Arial, sans-serif;
         font-size: 2.9rem;
         font-weight: 700;
         letter-spacing: 0.03em;
@@ -314,7 +313,7 @@ st.markdown(
 
     .section-heading {
         color: #ffffff;
-        font-family: 'Oswald', sans-serif;
+        font-family: Impact, Arial Black, Arial, sans-serif;
         font-size: 1.65rem;
         font-weight: 600;
         margin-top: 1.6rem;
@@ -354,7 +353,7 @@ st.markdown(
 
     .value {
         color: #ffffff;
-        font-family: 'Oswald', sans-serif;
+        font-family: Impact, Arial Black, Arial, sans-serif;
         font-size: 2rem;
         font-weight: 600;
         line-height: 1.08;
@@ -415,7 +414,7 @@ st.markdown(
 
     .count-num {
         color: #ff7a00;
-        font-family: 'Oswald', sans-serif;
+        font-family: Impact, Arial Black, Arial, sans-serif;
         font-size: 2.9rem;
         font-weight: 700;
         line-height: 1;
@@ -490,7 +489,7 @@ st.markdown(
 
     .result-score {
         color: #ffffff;
-        font-family: 'Oswald', sans-serif;
+        font-family: Impact, Arial Black, Arial, sans-serif;
         font-size: 1.35rem;
         font-weight: 600;
         letter-spacing: 0.02em;
@@ -526,7 +525,7 @@ st.markdown(
 
     .roster-heading {
         color: #ffffff;
-        font-family: 'Oswald', sans-serif;
+        font-family: Impact, Arial Black, Arial, sans-serif;
         font-size: 2rem;
         font-weight: 600;
         text-align: center;
@@ -595,7 +594,7 @@ st.markdown(
         display: flex;
         align-items: center;
         justify-content: center;
-        font-family: 'Oswald', sans-serif;
+        font-family: Impact, Arial Black, Arial, sans-serif;
         font-size: 1.9rem;
         font-weight: 700;
         box-shadow: 0 12px 28px rgba(0,0,0,0.28);
@@ -603,7 +602,7 @@ st.markdown(
 
     .player-number {
         color: #ff7a00;
-        font-family: 'Oswald', sans-serif;
+        font-family: Impact, Arial Black, Arial, sans-serif;
         font-size: 1.7rem;
         font-weight: 600;
         margin-bottom: 0.22rem;
