@@ -474,68 +474,79 @@ st.markdown(
         text-decoration: none !important;
     }
 
+    .roster-heading {
+        color: #ffffff;
+        font-size: 1.9rem;
+        font-weight: 900;
+        text-align: center;
+        margin-top: 1.8rem;
+        margin-bottom: 1.2rem;
+        letter-spacing: 0.02em;
+    }
+
     .players-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 0.9rem;
-        margin-top: 0.2rem;
+        gap: 1.6rem 1.2rem;
+        margin-top: 0.4rem;
     }
 
     .player-card {
-        background: linear-gradient(180deg, #101722 0%, #0c1119 100%);
-        border: 1px solid #1e2937;
-        border-radius: 22px;
-        padding: 1rem;
-        box-shadow: 0 10px 28px rgba(0,0,0,0.28);
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        padding: 0.2rem 0.4rem 0.8rem 0.4rem;
         text-align: center;
     }
 
     .player-photo-wrap {
         display: flex;
         justify-content: center;
-        margin-bottom: 0.85rem;
+        margin-bottom: 1rem;
     }
 
     .player-photo {
-        width: 110px;
-        height: 110px;
+        width: 132px;
+        height: 132px;
         object-fit: cover;
-        border-radius: 18px;
+        border-radius: 22px;
         border: 1px solid #243244;
         display: block;
+        box-shadow: 0 10px 24px rgba(0,0,0,0.28);
     }
 
     .player-photo-placeholder {
-        width: 110px;
-        height: 110px;
-        border-radius: 18px;
+        width: 132px;
+        height: 132px;
+        border-radius: 22px;
         border: 1px solid #243244;
         background: linear-gradient(180deg, #0d141d 0%, #111a26 100%);
         color: #ff7a00;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.5rem;
+        font-size: 1.7rem;
         font-weight: 900;
+        box-shadow: 0 10px 24px rgba(0,0,0,0.28);
     }
 
     .player-number {
         color: #ff7a00;
-        font-size: 1.5rem;
+        font-size: 1.55rem;
         font-weight: 900;
-        margin-bottom: 0.35rem;
+        margin-bottom: 0.28rem;
     }
 
     .player-name {
         color: #ffffff;
-        font-size: 1.05rem;
+        font-size: 1.08rem;
         font-weight: 800;
-        margin-bottom: 0.25rem;
+        margin-bottom: 0.22rem;
     }
 
     .player-position {
         color: #94a3b8;
-        font-size: 0.95rem;
+        font-size: 0.96rem;
     }
 
     .empty-box {
@@ -565,6 +576,17 @@ st.markdown(
 
         .players-grid {
             grid-template-columns: repeat(2, 1fr);
+            gap: 1.4rem 1rem;
+        }
+
+        .player-photo,
+        .player-photo-placeholder {
+            width: 120px;
+            height: 120px;
+        }
+
+        .roster-heading {
+            font-size: 1.7rem;
         }
     }
 
@@ -604,12 +626,19 @@ st.markdown(
 
         .players-grid {
             grid-template-columns: 1fr;
+            gap: 1.25rem;
         }
 
         .player-photo,
         .player-photo-placeholder {
-            width: 96px;
-            height: 96px;
+            width: 108px;
+            height: 108px;
+        }
+
+        .roster-heading {
+            font-size: 1.5rem;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
         }
     }
     </style>
@@ -818,7 +847,7 @@ No previous results found. Update results.csv.
 # -------------------------------------------------
 # Players
 # -------------------------------------------------
-st.markdown('<div class="section-heading">Players</div>', unsafe_allow_html=True)
+st.markdown('<div class="roster-heading">Team Roster</div>', unsafe_allow_html=True)
 
 if not players_df.empty:
     players_html = '<div class="players-grid">'
