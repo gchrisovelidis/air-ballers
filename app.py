@@ -239,6 +239,8 @@ streak = get_streak(results_df)
 st.markdown(
     """
     <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Oswald:wght@400;500;600;700&display=swap');
+
     #MainMenu {visibility: hidden;}
     header {visibility: hidden;}
     footer {visibility: hidden;}
@@ -246,6 +248,7 @@ st.markdown(
     html, body, [data-testid="stAppViewContainer"], .stApp {
         background: #05070b !important;
         color: white !important;
+        font-family: 'Inter', sans-serif !important;
     }
 
     [data-testid="stAppViewContainer"] > .main {
@@ -255,7 +258,7 @@ st.markdown(
     .block-container {
         max-width: 1200px;
         padding-top: 1.2rem;
-        padding-bottom: 2.5rem;
+        padding-bottom: 2.8rem;
         padding-left: 1rem;
         padding-right: 1rem;
     }
@@ -264,86 +267,116 @@ st.markdown(
         display: flex;
         justify-content: center;
         align-items: center;
-        margin-top: 0.2rem;
-        margin-bottom: 0.55rem;
+        margin-top: 0.25rem;
+        margin-bottom: 0.65rem;
     }
 
     .hero-logo {
         width: 210px;
         max-width: 70vw;
         display: block;
-        border-radius: 18px;
+        border-radius: 20px;
+        box-shadow: 0 0 40px rgba(255, 122, 0, 0.14);
     }
 
     .hero-wrap {
         text-align: center;
-        margin-bottom: 1.2rem;
+        margin-bottom: 1.35rem;
     }
 
     .hero-title {
         color: #ffffff;
-        font-size: 2.4rem;
-        font-weight: 900;
-        letter-spacing: 0.02em;
-        margin-top: 0.1rem;
-        margin-bottom: 0.15rem;
+        font-family: 'Oswald', sans-serif;
+        font-size: 2.9rem;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        margin-top: 0.05rem;
+        margin-bottom: 0.08rem;
+        text-transform: uppercase;
     }
 
     .hero-subtitle {
-        color: #98a2b3;
+        color: #b8c4d6;
         font-size: 1rem;
-        margin-bottom: 0.2rem;
+        margin-bottom: 0.45rem;
+        text-transform: uppercase;
+        letter-spacing: 0.10em;
+    }
+
+    .hero-accent {
+        width: 72px;
+        height: 3px;
+        border-radius: 999px;
+        margin: 0 auto;
+        background: linear-gradient(90deg, #ff7a00, #ff9d3d);
+        box-shadow: 0 0 14px rgba(255, 122, 0, 0.22);
     }
 
     .section-heading {
         color: #ffffff;
-        font-size: 1.25rem;
-        font-weight: 800;
-        margin-top: 1.4rem;
-        margin-bottom: 0.8rem;
+        font-family: 'Oswald', sans-serif;
+        font-size: 1.65rem;
+        font-weight: 600;
+        margin-top: 1.6rem;
+        margin-bottom: 0.9rem;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
     }
 
     .card {
-        background: linear-gradient(180deg, #101722 0%, #0c1119 100%);
-        border: 1px solid #1e2937;
+        background: linear-gradient(180deg, #0f1720 0%, #0b1118 100%);
+        border: 1px solid #1b2633;
         border-radius: 24px;
-        padding: 1.15rem 1.15rem;
-        box-shadow: 0 14px 36px rgba(0,0,0,0.35);
-        min-height: 170px;
+        padding: 1rem 1.05rem;
+        box-shadow: 0 14px 36px rgba(0,0,0,0.34);
+        min-height: 160px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .card::before {
+        content: "";
+        position: absolute;
+        inset: 0 auto auto 0;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(90deg, rgba(255,122,0,0.55), rgba(255,157,61,0.08));
     }
 
     .label {
         color: #9fb0c7;
-        font-size: 0.82rem;
+        font-size: 0.8rem;
         font-weight: 800;
         text-transform: uppercase;
-        letter-spacing: 0.08em;
-        margin-bottom: 0.9rem;
+        letter-spacing: 0.10em;
+        margin-bottom: 0.75rem;
     }
 
     .value {
         color: #ffffff;
-        font-size: 1.8rem;
-        font-weight: 900;
-        line-height: 1.15;
-        margin-bottom: 0.5rem;
+        font-family: 'Oswald', sans-serif;
+        font-size: 2rem;
+        font-weight: 600;
+        line-height: 1.08;
+        margin-bottom: 0.45rem;
+        letter-spacing: 0.01em;
     }
 
     .sub {
-        color: #c7d1dd;
-        font-size: 1rem;
-        line-height: 1.45;
+        color: #b8c4d6;
+        font-size: 0.98rem;
+        line-height: 1.42;
         margin-top: 0.15rem;
     }
 
     .pill-win,
     .pill-loss {
         display: inline-block;
-        padding: 0.38rem 0.8rem;
+        padding: 0.38rem 0.82rem;
         border-radius: 999px;
-        font-size: 0.88rem;
+        font-size: 0.87rem;
         font-weight: 800;
-        margin-top: 0.2rem;
+        margin-top: 0.15rem;
     }
 
     .pill-win {
@@ -357,11 +390,11 @@ st.markdown(
     }
 
     .countdown-shell {
-        background: linear-gradient(180deg, #101722 0%, #0c1119 100%);
-        border: 1px solid #1e2937;
+        background: linear-gradient(180deg, #0f1720 0%, #0b1118 100%);
+        border: 1px solid #1b2633;
         border-radius: 28px;
         padding: 1rem;
-        box-shadow: 0 14px 36px rgba(0,0,0,0.35);
+        box-shadow: 0 14px 36px rgba(0,0,0,0.34);
         margin-top: 0.2rem;
     }
 
@@ -372,47 +405,59 @@ st.markdown(
     }
 
     .count-box {
-        background: #060b13;
+        background: linear-gradient(180deg, #070c13 0%, #0a1017 100%);
         border: 1px solid #182232;
         border-radius: 22px;
         padding: 1.35rem 0.8rem;
         text-align: center;
+        box-shadow: inset 0 0 0 1px rgba(255,255,255,0.01);
     }
 
     .count-num {
         color: #ff7a00;
-        font-size: 2.6rem;
-        font-weight: 900;
+        font-family: 'Oswald', sans-serif;
+        font-size: 2.9rem;
+        font-weight: 700;
         line-height: 1;
-        margin-bottom: 0.45rem;
+        margin-bottom: 0.42rem;
+        text-shadow: 0 0 12px rgba(255, 122, 0, 0.20);
     }
 
     .count-lbl {
-        color: #d8dee7;
-        font-size: 0.95rem;
-        letter-spacing: 0.08em;
+        color: #d9e1ec;
+        font-size: 0.93rem;
+        letter-spacing: 0.10em;
         text-transform: uppercase;
+        font-weight: 700;
     }
 
     .countdown-note {
-        color: #9fb0c7;
+        color: #aebed2;
         text-align: center;
-        font-size: 0.95rem;
-        margin-top: 0.75rem;
+        font-size: 0.96rem;
+        margin-top: 0.78rem;
+        letter-spacing: 0.03em;
     }
 
     .results-grid {
         display: grid;
-        gap: 0.9rem;
+        gap: 0.95rem;
         margin-top: 0.2rem;
     }
 
     .result-card {
-        background: linear-gradient(180deg, #101722 0%, #0c1119 100%);
-        border: 1px solid #1e2937;
+        background: linear-gradient(180deg, #0f1720 0%, #0b1118 100%);
+        border: 1px solid #1b2633;
         border-radius: 22px;
         padding: 1rem 1rem;
         box-shadow: 0 10px 28px rgba(0,0,0,0.28);
+        transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .result-card:hover {
+        transform: translateY(-2px);
+        border-color: #2a3747;
+        box-shadow: 0 16px 34px rgba(0,0,0,0.34);
     }
 
     .result-top {
@@ -425,13 +470,13 @@ st.markdown(
 
     .result-opponent {
         color: #ffffff;
-        font-size: 1.08rem;
+        font-size: 1.1rem;
         font-weight: 800;
     }
 
     .result-date {
-        color: #94a3b8;
-        font-size: 0.92rem;
+        color: #a9b8ca;
+        font-size: 0.93rem;
     }
 
     .result-bottom {
@@ -440,117 +485,145 @@ st.markdown(
         gap: 1rem;
         flex-wrap: wrap;
         align-items: center;
-        margin-top: 0.65rem;
+        margin-top: 0.7rem;
     }
 
     .result-score {
         color: #ffffff;
-        font-size: 1.05rem;
-        font-weight: 900;
+        font-family: 'Oswald', sans-serif;
+        font-size: 1.35rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
     }
 
     .watch-wrap {
-        margin-top: 0.85rem;
+        margin-top: 0.9rem;
     }
 
     .watch-link {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        padding: 0.62rem 1rem;
-        border-radius: 12px;
-        background: #ff7a00;
+        padding: 0.68rem 1.05rem;
+        border-radius: 999px;
+        background: linear-gradient(135deg, #ff7a00, #ff9d3d);
         color: #ffffff !important;
         text-decoration: none !important;
         font-weight: 800;
         font-size: 0.92rem;
-        border: 1px solid #ff8f26;
-        transition: all 0.2s ease;
+        border: none;
+        box-shadow: 0 8px 20px rgba(255, 122, 0, 0.18);
+        transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
     }
 
     .watch-link:hover {
-        background: #ff8f26;
+        transform: translateY(-1px);
+        filter: brightness(1.04);
+        box-shadow: 0 12px 24px rgba(255, 122, 0, 0.24);
         color: #ffffff !important;
         text-decoration: none !important;
     }
 
     .roster-heading {
         color: #ffffff;
-        font-size: 1.9rem;
-        font-weight: 900;
+        font-family: 'Oswald', sans-serif;
+        font-size: 2rem;
+        font-weight: 600;
         text-align: center;
-        margin-top: 1.8rem;
-        margin-bottom: 1.2rem;
-        letter-spacing: 0.02em;
+        margin-top: 2rem;
+        margin-bottom: 1.25rem;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+        position: relative;
+    }
+
+    .roster-heading::after {
+        content: "";
+        display: block;
+        width: 72px;
+        height: 3px;
+        border-radius: 999px;
+        margin: 0.55rem auto 0 auto;
+        background: linear-gradient(90deg, #ff7a00, #ff9d3d);
+        box-shadow: 0 0 14px rgba(255,122,0,0.18);
     }
 
     .players-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 1.6rem 1.2rem;
-        margin-top: 0.4rem;
+        gap: 1.7rem 1.2rem;
+        margin-top: 0.45rem;
     }
 
     .player-card {
         background: transparent;
         border: none;
         box-shadow: none;
-        padding: 0.2rem 0.4rem 0.8rem 0.4rem;
+        padding: 0.2rem 0.4rem 0.95rem 0.4rem;
         text-align: center;
     }
 
     .player-photo-wrap {
         display: flex;
         justify-content: center;
-        margin-bottom: 1rem;
+        margin-bottom: 1.05rem;
     }
 
     .player-photo {
-        width: 132px;
-        height: 132px;
+        width: 136px;
+        height: 136px;
         object-fit: cover;
-        border-radius: 22px;
+        border-radius: 24px;
         border: 1px solid #243244;
         display: block;
-        box-shadow: 0 10px 24px rgba(0,0,0,0.28);
+        box-shadow: 0 12px 28px rgba(0,0,0,0.28);
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .player-photo:hover {
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 16px 30px rgba(0,0,0,0.34);
     }
 
     .player-photo-placeholder {
-        width: 132px;
-        height: 132px;
-        border-radius: 22px;
+        width: 136px;
+        height: 136px;
+        border-radius: 24px;
         border: 1px solid #243244;
         background: linear-gradient(180deg, #0d141d 0%, #111a26 100%);
         color: #ff7a00;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.7rem;
-        font-weight: 900;
-        box-shadow: 0 10px 24px rgba(0,0,0,0.28);
+        font-family: 'Oswald', sans-serif;
+        font-size: 1.9rem;
+        font-weight: 700;
+        box-shadow: 0 12px 28px rgba(0,0,0,0.28);
     }
 
     .player-number {
         color: #ff7a00;
-        font-size: 1.55rem;
-        font-weight: 900;
-        margin-bottom: 0.28rem;
+        font-family: 'Oswald', sans-serif;
+        font-size: 1.7rem;
+        font-weight: 600;
+        margin-bottom: 0.22rem;
+        line-height: 1;
     }
 
     .player-name {
         color: #ffffff;
-        font-size: 1.08rem;
+        font-size: 1.1rem;
         font-weight: 800;
-        margin-bottom: 0.22rem;
+        margin-bottom: 0.24rem;
     }
 
     .player-position {
-        color: #94a3b8;
-        font-size: 0.96rem;
+        color: #a9b8ca;
+        font-size: 0.97rem;
     }
 
     .empty-box {
-        background: linear-gradient(180deg, #101722 0%, #0c1119 100%);
+        background: linear-gradient(180deg, #0f1720 0%, #0b1118 100%);
         border: 1px dashed #334155;
         border-radius: 22px;
         padding: 1rem;
@@ -563,30 +636,30 @@ st.markdown(
         }
 
         .hero-title {
-            font-size: 2rem;
+            font-size: 2.45rem;
         }
 
         .value {
-            font-size: 1.5rem;
+            font-size: 1.75rem;
         }
 
         .count-num {
-            font-size: 2.1rem;
+            font-size: 2.35rem;
         }
 
         .players-grid {
             grid-template-columns: repeat(2, 1fr);
-            gap: 1.4rem 1rem;
+            gap: 1.45rem 1rem;
         }
 
         .player-photo,
         .player-photo-placeholder {
-            width: 120px;
-            height: 120px;
+            width: 122px;
+            height: 122px;
         }
 
         .roster-heading {
-            font-size: 1.7rem;
+            font-size: 1.8rem;
         }
     }
 
@@ -601,11 +674,11 @@ st.markdown(
         }
 
         .hero-title {
-            font-size: 1.75rem;
+            font-size: 2.05rem;
         }
 
         .hero-subtitle {
-            font-size: 0.92rem;
+            font-size: 0.9rem;
         }
 
         .count-grid {
@@ -613,11 +686,11 @@ st.markdown(
         }
 
         .count-num {
-            font-size: 1.9rem;
+            font-size: 2.05rem;
         }
 
         .value {
-            font-size: 1.35rem;
+            font-size: 1.55rem;
         }
 
         .card {
@@ -631,13 +704,13 @@ st.markdown(
 
         .player-photo,
         .player-photo-placeholder {
-            width: 108px;
-            height: 108px;
+            width: 110px;
+            height: 110px;
         }
 
         .roster-heading {
-            font-size: 1.5rem;
-            margin-top: 1.5rem;
+            font-size: 1.6rem;
+            margin-top: 1.6rem;
             margin-bottom: 1rem;
         }
     }
@@ -645,248 +718,3 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
-
-# -------------------------------------------------
-# Hero
-# -------------------------------------------------
-if Path(LOGO_FILE).exists():
-    logo_path = Path(LOGO_FILE)
-    logo_b64 = base64.b64encode(logo_path.read_bytes()).decode()
-    logo_mime = get_mime_type(logo_path)
-
-    st.markdown(
-        f"""
-<div class="hero-logo-wrap">
-<img src="data:{logo_mime};base64,{logo_b64}" class="hero-logo">
-</div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-st.markdown(
-    f"""
-<div class="hero-wrap">
-<div class="hero-title">{TEAM_NAME}</div>
-<div class="hero-subtitle">{TEAM_SUBTITLE}</div>
-</div>
-    """,
-    unsafe_allow_html=True,
-)
-
-# -------------------------------------------------
-# Top cards
-# -------------------------------------------------
-col1, col2, col3 = st.columns(3)
-
-with col1:
-    if next_game:
-        st.markdown(
-            f"""
-<div class="card">
-<div class="label">Next Game</div>
-<div class="value">vs {esc(next_game['opponent'])}</div>
-<div class="sub">{esc(format_game_datetime(next_game['datetime']))}</div>
-<div class="sub">{esc(next_game['home_away'])} • {esc(next_game['venue'])}</div>
-</div>
-            """,
-            unsafe_allow_html=True,
-        )
-    else:
-        st.markdown(
-            """
-<div class="card">
-<div class="label">Next Game</div>
-<div class="value">Not set</div>
-<div class="sub">Update next_game.csv</div>
-</div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-with col2:
-    if streak["type"] == "win":
-        streak_sub = "Team is on a hot run"
-    elif streak["type"] == "loss":
-        streak_sub = "Time to bounce back"
-    else:
-        streak_sub = "No results available yet"
-
-    st.markdown(
-        f"""
-<div class="card">
-<div class="label">{esc(streak['label'])}</div>
-<div class="value">{esc(streak['value'])}</div>
-<div class="sub">{esc(streak_sub)}</div>
-</div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-with col3:
-    if last_result:
-        pill_class = "pill-win" if last_result["result"] == "W" else "pill-loss"
-        pill_text = "Win" if last_result["result"] == "W" else "Loss"
-
-        st.markdown(
-            f"""
-<div class="card">
-<div class="label">Last Result</div>
-<div class="value">vs {esc(last_result['opponent'])}</div>
-<div class="{pill_class}">{pill_text}</div>
-<div class="sub">{esc(last_result['score'])}</div>
-</div>
-            """,
-            unsafe_allow_html=True,
-        )
-    else:
-        st.markdown(
-            """
-<div class="card">
-<div class="label">Last Result</div>
-<div class="value">No games yet</div>
-<div class="sub">Update results.csv</div>
-</div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-# -------------------------------------------------
-# Countdown
-# -------------------------------------------------
-st.markdown('<div class="section-heading">Countdown to Next Game</div>', unsafe_allow_html=True)
-
-if next_game:
-    countdown = get_countdown(next_game["datetime"])
-    if countdown:
-        st.markdown(
-            f"""
-<div class="countdown-shell">
-<div class="count-grid">
-<div class="count-box">
-<div class="count-num">{countdown['days']}</div>
-<div class="count-lbl">Days</div>
-</div>
-<div class="count-box">
-<div class="count-num">{countdown['hours']}</div>
-<div class="count-lbl">Hours</div>
-</div>
-<div class="count-box">
-<div class="count-num">{countdown['minutes']}</div>
-<div class="count-lbl">Minutes</div>
-</div>
-</div>
-<div class="countdown-note">Until tip-off</div>
-</div>
-            """,
-            unsafe_allow_html=True,
-        )
-    else:
-        st.markdown(
-            """
-<div class="empty-box">
-The scheduled game time has already passed. Update next_game.csv with the next fixture.
-</div>
-            """,
-            unsafe_allow_html=True,
-        )
-else:
-    st.markdown(
-        """
-<div class="empty-box">
-No next game found. Update next_game.csv.
-</div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-# -------------------------------------------------
-# Previous results
-# -------------------------------------------------
-st.markdown('<div class="section-heading">Previous Results</div>', unsafe_allow_html=True)
-
-if not results_df.empty:
-    results_html = '<div class="results-grid">'
-
-    for _, row in results_df.head(8).iterrows():
-        result_class = "pill-win" if row["result"] == "W" else "pill-loss"
-        result_word = "Win" if row["result"] == "W" else "Loss"
-        date_str = row["date"].strftime("%d %b %Y")
-
-        watch_html = ""
-        youtube_url = str(row.get("youtube_url", "")).strip()
-
-        if youtube_url:
-            watch_html = f"""<div class="watch-wrap">
-<a href="{youtube_url}" target="_blank" rel="noopener noreferrer" class="watch-link">Watch Game</a>
-</div>"""
-
-        results_html += f"""<div class="result-card">
-<div class="result-top">
-<div class="result-opponent">vs {esc(row['opponent'])}</div>
-<div class="result-date">{esc(date_str)}</div>
-</div>
-<div class="result-bottom">
-<div class="{result_class}">{result_word}</div>
-<div class="result-score">{esc(row['score_display'])}</div>
-</div>
-{watch_html}
-</div>"""
-
-    results_html += "</div>"
-    st.markdown(results_html, unsafe_allow_html=True)
-else:
-    st.markdown(
-        """
-<div class="empty-box">
-No previous results found. Update results.csv.
-</div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-# -------------------------------------------------
-# Players
-# -------------------------------------------------
-st.markdown('<div class="roster-heading">Team Roster</div>', unsafe_allow_html=True)
-
-if not players_df.empty:
-    players_html = '<div class="players-grid">'
-
-    for _, row in players_df.iterrows():
-        photo_name = str(row.get("photo", "")).strip()
-        photo_html = ""
-
-        if photo_name:
-            photo_path = IMAGES_DIR / photo_name
-            if photo_path.exists():
-                img_b64 = base64.b64encode(photo_path.read_bytes()).decode()
-                mime_type = get_mime_type(photo_path)
-
-                photo_html = f"""<div class="player-photo-wrap">
-<img src="data:{mime_type};base64,{img_b64}" class="player-photo">
-</div>"""
-
-        if not photo_html:
-            initials = "".join([part[0] for part in str(row["name"]).split()[:2]]).upper()
-            photo_html = f"""<div class="player-photo-wrap">
-<div class="player-photo-placeholder">{esc(initials)}</div>
-</div>"""
-
-        players_html += f"""<div class="player-card">
-{photo_html}
-<div class="player-number">#{esc(row['number'])}</div>
-<div class="player-name">{esc(row['name'])}</div>
-<div class="player-position">{esc(row['position'])}</div>
-</div>"""
-
-    players_html += "</div>"
-    st.markdown(players_html, unsafe_allow_html=True)
-else:
-    st.markdown(
-        """
-<div class="empty-box">
-No players found. Update players.csv.
-</div>
-        """,
-        unsafe_allow_html=True,
-    )
