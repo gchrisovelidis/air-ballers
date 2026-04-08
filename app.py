@@ -432,6 +432,47 @@ st.markdown(
         .card {
             min-height: auto;
         }
+        .countdown-center {
+            background: linear-gradient(180deg, #101722 0%, #0c1119 100%);
+            border: 1px solid #1e2937;
+            border-radius: 28px;
+            padding: 1.6rem 1rem;
+            box-shadow: 0 14px 36px rgba(0,0,0,0.35);
+            text-align: center;
+        }
+        
+        .countdown-big {
+            color: #ff7a00;
+            font-size: 2.8rem;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 0.45rem;
+        }
+        
+        .countdown-small {
+            color: #cbd5e1;
+            font-size: 1rem;
+            letter-spacing: 0.03em;
+        }
+        
+        @media (max-width: 640px) {
+            .countdown-big {
+                font-size: 2rem;
+            }
+        
+            .countdown-small {
+                font-size: 0.92rem;
+            }
+            .hero-wrap {
+                text-align: center;
+                margin-bottom: 1.2rem;
+            }
+            
+            .hero-title {
+                margin-top: 0.35rem;
+                margin-bottom: 0.15rem;
+            }
+        }
     }
     </style>
     """,
@@ -442,9 +483,9 @@ st.markdown(
 # Hero
 # -------------------------------------------------
 if Path(LOGO_FILE).exists():
-    c1, c2, c3 = st.columns([1, 1.2, 1])
-    with c2:
-        st.image(LOGO_FILE, width=140)
+    col_logo_left, col_logo_center, col_logo_right = st.columns([1, 2, 1])
+    with col_logo_center:
+        st.image(LOGO_FILE, width=210)
 
 st.markdown(
     f"""
@@ -543,40 +584,32 @@ if next_game:
     if countdown:
         st.markdown(
             f"""
-            <div class="countdown-shell">
-                <div class="count-grid">
-                    <div class="count-box">
-                        <div class="count-num">{countdown['days']}</div>
-                        <div class="count-lbl">Days</div>
-                    </div>
-                    <div class="count-box">
-                        <div class="count-num">{countdown['hours']}</div>
-                        <div class="count-lbl">Hours</div>
-                    </div>
-                    <div class="count-box">
-                        <div class="count-num">{countdown['minutes']}</div>
-                        <div class="count-lbl">Minutes</div>
-                    </div>
-                </div>
-            </div>
+<div class="countdown-center">
+    <div class="countdown-big">
+        {countdown['days']} Days • {countdown['hours']} Hours • {countdown['minutes']} Minutes
+    </div>
+    <div class="countdown-small">
+        Until tip-off
+    </div>
+</div>
             """,
             unsafe_allow_html=True,
         )
     else:
         st.markdown(
             """
-            <div class="empty-box">
-                The scheduled game time has already passed. Update next_game.csv with the next fixture.
-            </div>
+<div class="empty-box">
+The scheduled game time has already passed. Update next_game.csv with the next fixture.
+</div>
             """,
             unsafe_allow_html=True,
         )
 else:
     st.markdown(
         """
-        <div class="empty-box">
-            No next game found. Update next_game.csv.
-        </div>
+<div class="empty-box">
+No next game found. Update next_game.csv.
+</div>
         """,
         unsafe_allow_html=True,
     )
