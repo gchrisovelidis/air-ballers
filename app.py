@@ -23,7 +23,7 @@ TIMEZONE = ZoneInfo("Europe/Athens")
 
 NEXT_GAME_FILE = "next_game.csv"
 RESULTS_FILE = "results.csv"
-LOGO_FILE = "logo.png"  # optional
+LOGO_FILE = "logo.png"
 
 # -------------------------------------------------
 # Helpers
@@ -34,24 +34,14 @@ def load_csv_safe(path: str, columns: list[str]) -> pd.DataFrame:
         return pd.DataFrame(columns=columns)
 
     try:
-        # Handles BOM + auto-detects comma/semicolon separator
         df = pd.read_csv(file_path, encoding="utf-8-sig", sep=None, engine="python")
-        df.columns = [str(col).strip().replace("\ufeff", "") for col in df.columns]
+        df.columns = [str(c).strip().replace("\ufeff", "") for c in df.columns]
         return df
     except Exception:
         return pd.DataFrame(columns=columns)
 
 
 def parse_next_game(df: pd.DataFrame):
-    """
-    Expected columns:
-    opponent,date,time,venue,home_away
-
-    Supported date examples:
-    2026-04-15
-    15/04/2026
-    15/4/2026
-    """
     if df.empty:
         return None
 
@@ -61,7 +51,13 @@ def parse_next_game(df: pd.DataFrame):
     time_value = str(row.get("time", "")).strip()
 
     game_dt = None
-    for fmt in ("%Y-%m-%d %H:%M", "%d/%m/%Y %H:%M", "%d/%m/%y %H:%M", "%d/%m/%Y %H.%M"):
+    for fmt in (
+        "%Y-%m-%d %H:%M",
+        "%d/%m/%Y %H:%M",
+        "%d/%m/%y %H:%M",
+        "%d/%m/%Y %H.%M",
+        "%d/%m/%y %H.%M",
+    ):
         try:
             game_dt = datetime.strptime(f"{date_value} {time_value}", fmt).replace(tzinfo=TIMEZONE)
             break
@@ -72,25 +68,21 @@ def parse_next_game(df: pd.DataFrame):
         return None
 
     return {
-        "opponent": row.get("opponent", "TBD"),
+        "opponent": str(row.get("opponent", "TBD")),
         "date": date_value,
         "time": time_value,
-        "venue": row.get("venue", "TBD"),
-        "home_away": row.get("home_away", "TBD"),
+        "venue": str(row.get("venue", "TBD")),
+        "home_away": str(row.get("home_away", "TBD")),
         "datetime": game_dt,
     }
 
 
 def enrich_results(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Expected columns:
-    date,opponent,team_score,opponent_score
-    """
     if df.empty:
         return df
 
     df = df.copy()
-    df.columns = [str(col).strip().replace("\ufeff", "") for col in df.columns]
+    df.columns = [str(c).strip().replace("\ufeff", "") for c in df.columns]
 
     required_cols = ["date", "opponent", "team_score", "opponent_score"]
     missing = [col for col in required_cols if col not in df.columns]
@@ -99,15 +91,13 @@ def enrich_results(df: pd.DataFrame) -> pd.DataFrame:
 
     df["team_score"] = pd.to_numeric(df["team_score"], errors="coerce")
     df["opponent_score"] = pd.to_numeric(df["opponent_score"], errors="coerce")
-
-    # dayfirst=True handles 31/3/2026 correctly
     df["date"] = pd.to_datetime(df["date"], errors="coerce", dayfirst=True)
 
     df = df.dropna(subset=["date", "team_score", "opponent_score"])
 
     df["result"] = df.apply(
         lambda x: "W" if x["team_score"] > x["opponent_score"] else "L",
-        axis=1
+        axis=1,
     )
     df["score_display"] = (
         df["team_score"].astype(int).astype(str)
@@ -122,6 +112,7 @@ def enrich_results(df: pd.DataFrame) -> pd.DataFrame:
 def get_last_result(results_df: pd.DataFrame):
     if results_df.empty:
         return None
+
     row = results_df.iloc[0]
     return {
         "opponent": row["opponent"],
@@ -145,17 +136,9 @@ def get_streak(results_df: pd.DataFrame):
             break
 
     if latest == "W":
-        return {
-            "label": "Winning Streak",
-            "value": str(streak_count),
-            "type": "win",
-        }
-    else:
-        return {
-            "label": "Losing Streak",
-            "value": str(streak_count),
-            "type": "loss",
-        }
+        return {"label": "Winning Streak", "value": str(streak_count), "type": "win"}
+
+    return {"label": "Losing Streak", "value": str(streak_count), "type": "loss"}
 
 
 def get_countdown(game_dt: datetime):
@@ -171,15 +154,15 @@ def get_countdown(game_dt: datetime):
     hours = remainder // 3600
     minutes = (remainder % 3600) // 60
 
-    return {
-        "days": days,
-        "hours": hours,
-        "minutes": minutes,
-    }
+    return {"days": days, "hours": hours, "minutes": minutes}
 
 
 def format_game_datetime(game_dt: datetime):
     return game_dt.strftime("%A, %d %B %Y • %H:%M")
+
+
+def esc(text) -> str:
+    return str(text).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
 
 # -------------------------------------------------
@@ -204,11 +187,11 @@ st.markdown(
     """
     <meta http-equiv="refresh" content="60">
     """,
-    unsafe_allow_html=True
+    unsafe_allow_html=True,
 )
 
 # -------------------------------------------------
-# CSS
+# Global styling
 # -------------------------------------------------
 st.markdown(
     """
@@ -217,255 +200,270 @@ st.markdown(
     header {visibility: hidden;}
     footer {visibility: hidden;}
 
+    html, body, [data-testid="stAppViewContainer"], .stApp {
+        background: #05070b !important;
+        color: white !important;
+    }
+
+    [data-testid="stAppViewContainer"] > .main {
+        background: #05070b !important;
+    }
+
     .block-container {
-        padding-top: 1rem;
-        padding-bottom: 2rem;
-        padding-left: 0.8rem;
-        padding-right: 0.8rem;
-        max-width: 1150px;
+        max-width: 1200px;
+        padding-top: 1.2rem;
+        padding-bottom: 2.5rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
     }
 
-    html, body, [class*="css"] {
-        font-family: Arial, sans-serif;
-    }
-
-    .app-bg {
-        background: linear-gradient(180deg, #0f1115 0%, #171b22 100%);
-        border-radius: 22px;
-        padding: 1rem;
-    }
-
-    .hero {
+    .hero-wrap {
         text-align: center;
-        padding: 0.4rem 0 1rem 0;
+        margin-bottom: 1.5rem;
     }
 
     .hero-title {
-        color: white;
-        font-size: 2rem;
+        color: #ffffff;
+        font-size: 2.4rem;
         font-weight: 900;
-        line-height: 1.1;
+        letter-spacing: 0.02em;
+        margin-top: 0.6rem;
         margin-bottom: 0.2rem;
     }
 
     .hero-subtitle {
-        color: #b9c0cc;
-        font-size: 0.98rem;
+        color: #98a2b3;
+        font-size: 1rem;
+        margin-bottom: 0.2rem;
     }
 
-    .section-title {
-        color: white;
-        font-size: 1.2rem;
+    .section-heading {
+        color: #ffffff;
+        font-size: 1.25rem;
         font-weight: 800;
-        margin: 1.1rem 0 0.8rem 0;
+        margin-top: 1.4rem;
+        margin-bottom: 0.8rem;
     }
 
-    .stat-card {
-        background: #1d232d;
-        border: 1px solid #2a3340;
-        border-radius: 20px;
-        padding: 1rem;
-        color: white;
-        min-height: 145px;
-        box-shadow: 0 8px 22px rgba(0,0,0,0.18);
+    .card {
+        background: linear-gradient(180deg, #101722 0%, #0c1119 100%);
+        border: 1px solid #1e2937;
+        border-radius: 24px;
+        padding: 1.15rem 1.15rem;
+        box-shadow: 0 14px 36px rgba(0,0,0,0.35);
+        min-height: 170px;
     }
 
-    .stat-label {
-        color: #aab4c3;
+    .label {
+        color: #9fb0c7;
         font-size: 0.82rem;
         font-weight: 800;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
-        margin-bottom: 0.65rem;
+        letter-spacing: 0.08em;
+        margin-bottom: 0.9rem;
     }
 
-    .stat-value {
-        color: white;
-        font-size: 1.45rem;
+    .value {
+        color: #ffffff;
+        font-size: 1.8rem;
         font-weight: 900;
-        line-height: 1.2;
+        line-height: 1.15;
+        margin-bottom: 0.5rem;
     }
 
-    .stat-sub {
-        color: #c6ced8;
-        font-size: 0.93rem;
-        margin-top: 0.45rem;
-        line-height: 1.4;
+    .sub {
+        color: #c7d1dd;
+        font-size: 1rem;
+        line-height: 1.45;
+        margin-top: 0.15rem;
     }
 
-    .countdown-wrap {
-        background: #1d232d;
-        border: 1px solid #2a3340;
-        border-radius: 24px;
+    .pill-win,
+    .pill-loss {
+        display: inline-block;
+        padding: 0.38rem 0.8rem;
+        border-radius: 999px;
+        font-size: 0.88rem;
+        font-weight: 800;
+        margin-top: 0.2rem;
+    }
+
+    .pill-win {
+        background: rgba(34, 197, 94, 0.16);
+        color: #4ade80;
+    }
+
+    .pill-loss {
+        background: rgba(239, 68, 68, 0.16);
+        color: #f87171;
+    }
+
+    .countdown-shell {
+        background: linear-gradient(180deg, #101722 0%, #0c1119 100%);
+        border: 1px solid #1e2937;
+        border-radius: 28px;
         padding: 1rem;
-        margin-top: 0.35rem;
+        box-shadow: 0 14px 36px rgba(0,0,0,0.35);
     }
 
-    .countdown-grid {
+    .count-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 0.8rem;
+        gap: 1rem;
     }
 
-    .countdown-box {
-        background: #12171d;
-        border-radius: 18px;
-        padding: 1rem 0.7rem;
+    .count-box {
+        background: #060b13;
+        border: 1px solid #182232;
+        border-radius: 22px;
+        padding: 1.25rem 0.8rem;
         text-align: center;
-        border: 1px solid #242c36;
     }
 
-    .countdown-number {
+    .count-num {
         color: #ff7a00;
-        font-size: 2rem;
+        font-size: 2.4rem;
         font-weight: 900;
         line-height: 1;
+        margin-bottom: 0.35rem;
     }
 
-    .countdown-label {
-        color: #b7c0cb;
-        font-size: 0.88rem;
-        margin-top: 0.35rem;
+    .count-lbl {
+        color: #d8dee7;
+        font-size: 0.95rem;
+        letter-spacing: 0.08em;
         text-transform: uppercase;
-        letter-spacing: 0.04em;
     }
 
-    .results-list {
+    .results-grid {
         display: grid;
-        gap: 0.8rem;
+        gap: 0.9rem;
+        margin-top: 0.2rem;
     }
 
     .result-card {
-        background: #1d232d;
-        border: 1px solid #2a3340;
-        border-radius: 18px;
-        padding: 0.9rem 1rem;
-        color: white;
+        background: linear-gradient(180deg, #101722 0%, #0c1119 100%);
+        border: 1px solid #1e2937;
+        border-radius: 22px;
+        padding: 1rem 1rem;
+        box-shadow: 0 10px 28px rgba(0,0,0,0.28);
     }
 
     .result-top {
         display: flex;
         justify-content: space-between;
-        align-items: center;
-        gap: 0.8rem;
+        gap: 1rem;
         flex-wrap: wrap;
+        align-items: center;
     }
 
     .result-opponent {
-        font-size: 1.02rem;
+        color: #ffffff;
+        font-size: 1.08rem;
         font-weight: 800;
     }
 
     .result-date {
-        color: #aeb8c5;
-        font-size: 0.9rem;
+        color: #94a3b8;
+        font-size: 0.92rem;
     }
 
     .result-bottom {
         display: flex;
         justify-content: space-between;
-        align-items: center;
-        margin-top: 0.55rem;
+        gap: 1rem;
         flex-wrap: wrap;
-        gap: 0.6rem;
+        align-items: center;
+        margin-top: 0.65rem;
     }
 
-    .badge-win, .badge-loss {
-        padding: 0.35rem 0.7rem;
-        border-radius: 999px;
-        font-size: 0.84rem;
-        font-weight: 800;
-        display: inline-block;
-    }
-
-    .badge-win {
-        background: rgba(34, 197, 94, 0.16);
-        color: #4ade80;
-    }
-
-    .badge-loss {
-        background: rgba(239, 68, 68, 0.16);
-        color: #f87171;
-    }
-
-    .score {
-        font-size: 1rem;
-        font-weight: 800;
+    .result-score {
+        color: #ffffff;
+        font-size: 1.05rem;
+        font-weight: 900;
     }
 
     .empty-box {
-        background: #1d232d;
-        border: 1px dashed #3a4655;
-        border-radius: 18px;
+        background: linear-gradient(180deg, #101722 0%, #0c1119 100%);
+        border: 1px dashed #334155;
+        border-radius: 22px;
         padding: 1rem;
-        color: #b7c0cb;
+        color: #cbd5e1;
+    }
+
+    .stImage {
+        text-align: center;
+    }
+
+    .stImage img {
+        border-radius: 16px;
     }
 
     @media (max-width: 900px) {
         .hero-title {
-            font-size: 1.7rem;
+            font-size: 2rem;
         }
 
-        .countdown-number {
-            font-size: 1.6rem;
+        .value {
+            font-size: 1.5rem;
+        }
+
+        .count-num {
+            font-size: 2rem;
         }
     }
 
     @media (max-width: 640px) {
         .block-container {
-            padding-left: 0.55rem;
-            padding-right: 0.55rem;
-        }
-
-        .app-bg {
-            padding: 0.8rem;
-            border-radius: 18px;
+            padding-left: 0.75rem;
+            padding-right: 0.75rem;
         }
 
         .hero-title {
-            font-size: 1.45rem;
+            font-size: 1.7rem;
         }
 
         .hero-subtitle {
-            font-size: 0.9rem;
+            font-size: 0.92rem;
         }
 
-        .countdown-grid {
+        .count-grid {
             grid-template-columns: 1fr;
         }
 
-        .stat-value {
-            font-size: 1.2rem;
+        .count-num {
+            font-size: 1.9rem;
         }
 
-        .countdown-number {
-            font-size: 1.45rem;
+        .value {
+            font-size: 1.35rem;
+        }
+
+        .card {
+            min-height: auto;
         }
     }
     </style>
     """,
-    unsafe_allow_html=True
+    unsafe_allow_html=True,
 )
-
-# -------------------------------------------------
-# Main wrapper
-# -------------------------------------------------
-st.markdown('<div class="app-bg">', unsafe_allow_html=True)
 
 # -------------------------------------------------
 # Hero
 # -------------------------------------------------
 if Path(LOGO_FILE).exists():
-    st.image(LOGO_FILE, width=100)
+    c1, c2, c3 = st.columns([1, 1.2, 1])
+    with c2:
+        st.image(LOGO_FILE, width=140)
 
 st.markdown(
     f"""
-    <div class="hero">
+    <div class="hero-wrap">
         <div class="hero-title">{TEAM_NAME}</div>
         <div class="hero-subtitle">{TEAM_SUBTITLE}</div>
     </div>
     """,
-    unsafe_allow_html=True
+    unsafe_allow_html=True,
 )
 
 # -------------------------------------------------
@@ -477,25 +475,25 @@ with col1:
     if next_game:
         st.markdown(
             f"""
-            <div class="stat-card">
-                <div class="stat-label">Next Game</div>
-                <div class="stat-value">vs {next_game['opponent']}</div>
-                <div class="stat-sub">{format_game_datetime(next_game['datetime'])}</div>
-                <div class="stat-sub">{next_game['home_away']} • {next_game['venue']}</div>
+            <div class="card">
+                <div class="label">Next Game</div>
+                <div class="value">vs {esc(next_game['opponent'])}</div>
+                <div class="sub">{esc(format_game_datetime(next_game['datetime']))}</div>
+                <div class="sub">{esc(next_game['home_away'])} • {esc(next_game['venue'])}</div>
             </div>
             """,
-            unsafe_allow_html=True
+            unsafe_allow_html=True,
         )
     else:
         st.markdown(
             """
-            <div class="stat-card">
-                <div class="stat-label">Next Game</div>
-                <div class="stat-value">Not set</div>
-                <div class="stat-sub">Check next_game.csv</div>
+            <div class="card">
+                <div class="label">Next Game</div>
+                <div class="value">Not set</div>
+                <div class="sub">Update next_game.csv</div>
             </div>
             """,
-            unsafe_allow_html=True
+            unsafe_allow_html=True,
         )
 
 with col2:
@@ -508,70 +506,71 @@ with col2:
 
     st.markdown(
         f"""
-        <div class="stat-card">
-            <div class="stat-label">{streak['label']}</div>
-            <div class="stat-value">{streak['value']}</div>
-            <div class="stat-sub">{streak_sub}</div>
+        <div class="card">
+            <div class="label">{esc(streak['label'])}</div>
+            <div class="value">{esc(streak['value'])}</div>
+            <div class="sub">{esc(streak_sub)}</div>
         </div>
         """,
-        unsafe_allow_html=True
+        unsafe_allow_html=True,
     )
 
 with col3:
     if last_result:
-        badge_class = "badge-win" if last_result["result"] == "W" else "badge-loss"
-        result_word = "Win" if last_result["result"] == "W" else "Loss"
+        pill_class = "pill-win" if last_result["result"] == "W" else "pill-loss"
+        pill_text = "Win" if last_result["result"] == "W" else "Loss"
+
         st.markdown(
             f"""
-            <div class="stat-card">
-                <div class="stat-label">Last Result</div>
-                <div class="stat-value">vs {last_result['opponent']}</div>
-                <div class="stat-sub"><span class="{badge_class}">{result_word}</span></div>
-                <div class="stat-sub">{last_result['score']}</div>
+            <div class="card">
+                <div class="label">Last Result</div>
+                <div class="value">vs {esc(last_result['opponent'])}</div>
+                <div class="{pill_class}">{pill_text}</div>
+                <div class="sub">{esc(last_result['score'])}</div>
             </div>
             """,
-            unsafe_allow_html=True
+            unsafe_allow_html=True,
         )
     else:
         st.markdown(
             """
-            <div class="stat-card">
-                <div class="stat-label">Last Result</div>
-                <div class="stat-value">No games yet</div>
-                <div class="stat-sub">Check results.csv</div>
+            <div class="card">
+                <div class="label">Last Result</div>
+                <div class="value">No games yet</div>
+                <div class="sub">Update results.csv</div>
             </div>
             """,
-            unsafe_allow_html=True
+            unsafe_allow_html=True,
         )
 
 # -------------------------------------------------
-# Countdown section
+# Countdown
 # -------------------------------------------------
-st.markdown('<div class="section-title">Countdown to Next Game</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-heading">Countdown to Next Game</div>', unsafe_allow_html=True)
 
 if next_game:
     countdown = get_countdown(next_game["datetime"])
     if countdown:
         st.markdown(
             f"""
-            <div class="countdown-wrap">
-                <div class="countdown-grid">
-                    <div class="countdown-box">
-                        <div class="countdown-number">{countdown['days']}</div>
-                        <div class="countdown-label">Days</div>
+            <div class="countdown-shell">
+                <div class="count-grid">
+                    <div class="count-box">
+                        <div class="count-num">{countdown['days']}</div>
+                        <div class="count-lbl">Days</div>
                     </div>
-                    <div class="countdown-box">
-                        <div class="countdown-number">{countdown['hours']}</div>
-                        <div class="countdown-label">Hours</div>
+                    <div class="count-box">
+                        <div class="count-num">{countdown['hours']}</div>
+                        <div class="count-lbl">Hours</div>
                     </div>
-                    <div class="countdown-box">
-                        <div class="countdown-number">{countdown['minutes']}</div>
-                        <div class="countdown-label">Minutes</div>
+                    <div class="count-box">
+                        <div class="count-num">{countdown['minutes']}</div>
+                        <div class="count-lbl">Minutes</div>
                     </div>
                 </div>
             </div>
             """,
-            unsafe_allow_html=True
+            unsafe_allow_html=True,
         )
     else:
         st.markdown(
@@ -580,41 +579,39 @@ if next_game:
                 The scheduled game time has already passed. Update next_game.csv with the next fixture.
             </div>
             """,
-            unsafe_allow_html=True
+            unsafe_allow_html=True,
         )
 else:
     st.markdown(
         """
         <div class="empty-box">
-            No next game found. Check next_game.csv.
+            No next game found. Update next_game.csv.
         </div>
         """,
-        unsafe_allow_html=True
+        unsafe_allow_html=True,
     )
 
 # -------------------------------------------------
 # Previous results
 # -------------------------------------------------
-st.markdown('<div class="section-title">Previous Results</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-heading">Previous Results</div>', unsafe_allow_html=True)
 
 if not results_df.empty:
-    recent_results = results_df.head(8)
-
-    results_html = '<div class="results-list">'
-    for _, row in recent_results.iterrows():
-        badge_class = "badge-win" if row["result"] == "W" else "badge-loss"
+    results_html = '<div class="results-grid">'
+    for _, row in results_df.head(8).iterrows():
+        result_class = "pill-win" if row["result"] == "W" else "pill-loss"
         result_word = "Win" if row["result"] == "W" else "Loss"
         date_str = row["date"].strftime("%d %b %Y")
 
         results_html += f"""
         <div class="result-card">
             <div class="result-top">
-                <div class="result-opponent">vs {row['opponent']}</div>
-                <div class="result-date">{date_str}</div>
+                <div class="result-opponent">vs {esc(row['opponent'])}</div>
+                <div class="result-date">{esc(date_str)}</div>
             </div>
             <div class="result-bottom">
-                <div><span class="{badge_class}">{result_word}</span></div>
-                <div class="score">{row['score_display']}</div>
+                <div class="{result_class}">{result_word}</div>
+                <div class="result-score">{esc(row['score_display'])}</div>
             </div>
         </div>
         """
@@ -625,10 +622,8 @@ else:
     st.markdown(
         """
         <div class="empty-box">
-            No previous results found. Check results.csv.
+            No previous results found. Update results.csv.
         </div>
         """,
-        unsafe_allow_html=True
+        unsafe_allow_html=True,
     )
-
-st.markdown("</div>", unsafe_allow_html=True)
