@@ -99,7 +99,13 @@ def enrich_results(df: pd.DataFrame) -> pd.DataFrame:
     df["team_score"] = pd.to_numeric(df["team_score"], errors="coerce")
     df["opponent_score"] = pd.to_numeric(df["opponent_score"], errors="coerce")
     df["date"] = pd.to_datetime(df["date"], errors="coerce", dayfirst=True)
-    df["youtube_url"] = df["youtube_url"].fillna("").astype(str).str.strip()
+    df["youtube_url"] = (
+        df["youtube_url"]
+        .fillna("")
+        .astype(str)
+        .str.strip()
+        .replace("nan", "")
+    )
 
     df = df.dropna(subset=["date", "team_score", "opponent_score"])
 
@@ -228,7 +234,30 @@ st.markdown(
     [data-testid="stAppViewContainer"] > .main {
         background: #05070b !important;
     }
-
+    .watch-wrap {
+        margin-top: 0.85rem;
+    }
+    
+    .watch-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.62rem 1rem;
+        border-radius: 12px;
+        background: #ff7a00;
+        color: #ffffff !important;
+        text-decoration: none !important;
+        font-weight: 800;
+        font-size: 0.92rem;
+        border: 1px solid #ff8f26;
+        transition: all 0.2s ease;
+    }
+    
+    .watch-link:hover {
+        background: #ff8f26;
+        color: #ffffff !important;
+        text-decoration: none !important;
+    }
     .block-container {
         max-width: 1200px;
         padding-top: 1.2rem;
@@ -717,8 +746,14 @@ if not results_df.empty:
         date_str = row["date"].strftime("%d %b %Y")
 
         watch_html = ""
-        if row["youtube_url"]:
-            watch_html = f'<a href="{esc(row["youtube_url"])}" target="_blank" class="watch-link">Watch Game</a>'
+        youtube_url = str(row.get("youtube_url", "")).strip()
+
+        if youtube_url:
+            watch_html = f"""<div class="watch-wrap">
+<a href="{youtube_url}" target="_blank" rel="noopener noreferrer" class="watch-link">
+Watch Game
+</a>
+</div>"""
 
         results_html += f"""<div class="result-card">
 <div class="result-top">
