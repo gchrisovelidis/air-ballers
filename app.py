@@ -30,38 +30,51 @@ LOGO_FILE = "logo.png"  # optional
 # -------------------------------------------------
 def load_csv_safe(path: str, columns: list[str]) -> pd.DataFrame:
     file_path = Path(path)
-    if file_path.exists():
-        try:
-            df = pd.read_csv(file_path)
-            return df
-        except Exception:
-            return pd.DataFrame(columns=columns)
-    return pd.DataFrame(columns=columns)
+    if not file_path.exists():
+        return pd.DataFrame(columns=columns)
+
+    try:
+        # Handles BOM + auto-detects comma/semicolon separator
+        df = pd.read_csv(file_path, encoding="utf-8-sig", sep=None, engine="python")
+        df.columns = [str(col).strip().replace("\ufeff", "") for col in df.columns]
+        return df
+    except Exception:
+        return pd.DataFrame(columns=columns)
 
 
 def parse_next_game(df: pd.DataFrame):
     """
     Expected columns:
     opponent,date,time,venue,home_away
-    Example date: 2026-04-15
-    Example time: 20:30
+
+    Supported date examples:
+    2026-04-15
+    15/04/2026
+    15/4/2026
     """
     if df.empty:
         return None
 
     row = df.iloc[0].to_dict()
 
-    try:
-        game_dt = datetime.strptime(
-            f"{row['date']} {row['time']}", "%Y-%m-%d %H:%M"
-        ).replace(tzinfo=TIMEZONE)
-    except Exception:
+    date_value = str(row.get("date", "")).strip()
+    time_value = str(row.get("time", "")).strip()
+
+    game_dt = None
+    for fmt in ("%Y-%m-%d %H:%M", "%d/%m/%Y %H:%M", "%d/%m/%y %H:%M", "%d/%m/%Y %H.%M"):
+        try:
+            game_dt = datetime.strptime(f"{date_value} {time_value}", fmt).replace(tzinfo=TIMEZONE)
+            break
+        except Exception:
+            continue
+
+    if game_dt is None:
         return None
 
     return {
         "opponent": row.get("opponent", "TBD"),
-        "date": row.get("date", ""),
-        "time": row.get("time", ""),
+        "date": date_value,
+        "time": time_value,
         "venue": row.get("venue", "TBD"),
         "home_away": row.get("home_away", "TBD"),
         "datetime": game_dt,
@@ -77,9 +90,19 @@ def enrich_results(df: pd.DataFrame) -> pd.DataFrame:
         return df
 
     df = df.copy()
+    df.columns = [str(col).strip().replace("\ufeff", "") for col in df.columns]
+
+    required_cols = ["date", "opponent", "team_score", "opponent_score"]
+    missing = [col for col in required_cols if col not in df.columns]
+    if missing:
+        return pd.DataFrame(columns=required_cols + ["result", "score_display"])
+
     df["team_score"] = pd.to_numeric(df["team_score"], errors="coerce")
     df["opponent_score"] = pd.to_numeric(df["opponent_score"], errors="coerce")
-    df["date"] = pd.to_datetime(df["date"], errors="coerce")
+
+    # dayfirst=True handles 31/3/2026 correctly
+    df["date"] = pd.to_datetime(df["date"], errors="coerce", dayfirst=True)
+
     df = df.dropna(subset=["date", "team_score", "opponent_score"])
 
     df["result"] = df.apply(
