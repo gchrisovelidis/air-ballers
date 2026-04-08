@@ -1,13 +1,13 @@
-﻿number;name;position;photo
-3;Andreadakis Nikos;Guard
-4;Koutziampasis Antonis;Guard;koutz.jpeg
-5;Chrysovelidis George;Guard
-7;Pantalonas Vaggelis;Guard;pantalonas.jpeg 
-8;Tsikouras Vaggelis;Forward
-10;Gkoustilis George;Guard;karou2.jpeg
-23;Krystallis Ricky;Center;ricky.jpeg
-24;Karagiannis Dimitris;Guard;karagiannis.jpeg
-27; Panouxos Nikos;Guard;panouxos.jpeg
-31;Goulas Tilemaxos;Forward; tile.jpeg
-34;Stratakis Stratos;Center
-42;Fragkis Kostas;Forward
+number;name;position;photo
+3;Andreadakis Nikos;Guard;
+4;Koutziampasis Antonis;Guard;koutz.jpg
+5;Chrysovelidis George;Guard;
+7;Pantalonas Vaggelis;Guard;pantalonas.jpg
+8;Tsikouras Vaggelis;Forward;
+10;Gkoustilis George;Guard;karou2.jpg
+23;Krystallis Ricky;Center;ricky.jpg
+24;Karagiannis Dimitris;Guard;karagiannis.jpg
+27;Panouxos Nikos;Guard;panouxos.jpg
+31;Goulas Tilemaxos;Forward;tile.jpg
+34;Stratakis Stratos;Center;
+42;Fragkis Kostas;Forward;
