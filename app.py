@@ -1,8 +1,10 @@
-import streamlit as st
-import pandas as pd
+import base64
 from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
+
+import pandas as pd
+import streamlit as st
 
 # -------------------------------------------------
 # Page config
@@ -46,7 +48,6 @@ def parse_next_game(df: pd.DataFrame):
         return None
 
     row = df.iloc[0].to_dict()
-
     date_value = str(row.get("date", "")).strip()
     time_value = str(row.get("time", "")).strip()
 
@@ -59,7 +60,9 @@ def parse_next_game(df: pd.DataFrame):
         "%d/%m/%y %H.%M",
     ):
         try:
-            game_dt = datetime.strptime(f"{date_value} {time_value}", fmt).replace(tzinfo=TIMEZONE)
+            game_dt = datetime.strptime(
+                f"{date_value} {time_value}", fmt
+            ).replace(tzinfo=TIMEZONE)
             break
         except Exception:
             continue
@@ -207,9 +210,24 @@ st.markdown(
         padding-right: 1rem;
     }
 
+    .hero-logo-wrap {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 0.2rem;
+        margin-bottom: 0.55rem;
+    }
+
+    .hero-logo {
+        width: 210px;
+        max-width: 70vw;
+        display: block;
+        border-radius: 18px;
+    }
+
     .hero-wrap {
         text-align: center;
-        margin-bottom: 1.5rem;
+        margin-bottom: 1.2rem;
     }
 
     .hero-title {
@@ -217,8 +235,8 @@ st.markdown(
         font-size: 2.4rem;
         font-weight: 900;
         letter-spacing: 0.02em;
-        margin-top: 0.6rem;
-        margin-bottom: 0.2rem;
+        margin-top: 0.1rem;
+        margin-bottom: 0.15rem;
     }
 
     .hero-subtitle {
@@ -294,6 +312,7 @@ st.markdown(
         border-radius: 28px;
         padding: 1rem;
         box-shadow: 0 14px 36px rgba(0,0,0,0.35);
+        margin-top: 0.2rem;
     }
 
     .count-grid {
@@ -306,16 +325,16 @@ st.markdown(
         background: #060b13;
         border: 1px solid #182232;
         border-radius: 22px;
-        padding: 1.25rem 0.8rem;
+        padding: 1.35rem 0.8rem;
         text-align: center;
     }
 
     .count-num {
         color: #ff7a00;
-        font-size: 2.4rem;
+        font-size: 2.6rem;
         font-weight: 900;
         line-height: 1;
-        margin-bottom: 0.35rem;
+        margin-bottom: 0.45rem;
     }
 
     .count-lbl {
@@ -323,6 +342,13 @@ st.markdown(
         font-size: 0.95rem;
         letter-spacing: 0.08em;
         text-transform: uppercase;
+    }
+
+    .countdown-note {
+        color: #9fb0c7;
+        text-align: center;
+        font-size: 0.95rem;
+        margin-top: 0.75rem;
     }
 
     .results-grid {
@@ -381,15 +407,11 @@ st.markdown(
         color: #cbd5e1;
     }
 
-    .stImage {
-        text-align: center;
-    }
-
-    .stImage img {
-        border-radius: 16px;
-    }
-
     @media (max-width: 900px) {
+        .hero-logo {
+            width: 180px;
+        }
+
         .hero-title {
             font-size: 2rem;
         }
@@ -399,7 +421,7 @@ st.markdown(
         }
 
         .count-num {
-            font-size: 2rem;
+            font-size: 2.1rem;
         }
     }
 
@@ -409,8 +431,12 @@ st.markdown(
             padding-right: 0.75rem;
         }
 
+        .hero-logo {
+            width: 150px;
+        }
+
         .hero-title {
-            font-size: 1.7rem;
+            font-size: 1.75rem;
         }
 
         .hero-subtitle {
@@ -432,47 +458,6 @@ st.markdown(
         .card {
             min-height: auto;
         }
-        .countdown-center {
-            background: linear-gradient(180deg, #101722 0%, #0c1119 100%);
-            border: 1px solid #1e2937;
-            border-radius: 28px;
-            padding: 1.6rem 1rem;
-            box-shadow: 0 14px 36px rgba(0,0,0,0.35);
-            text-align: center;
-        }
-        
-        .countdown-big {
-            color: #ff7a00;
-            font-size: 2.8rem;
-            font-weight: 900;
-            line-height: 1.1;
-            margin-bottom: 0.45rem;
-        }
-        
-        .countdown-small {
-            color: #cbd5e1;
-            font-size: 1rem;
-            letter-spacing: 0.03em;
-        }
-        
-        @media (max-width: 640px) {
-            .countdown-big {
-                font-size: 2rem;
-            }
-        
-            .countdown-small {
-                font-size: 0.92rem;
-            }
-            .hero-wrap {
-                text-align: center;
-                margin-bottom: 1.2rem;
-            }
-            
-            .hero-title {
-                margin-top: 0.35rem;
-                margin-bottom: 0.15rem;
-            }
-        }
     }
     </style>
     """,
@@ -483,9 +468,15 @@ st.markdown(
 # Hero
 # -------------------------------------------------
 if Path(LOGO_FILE).exists():
-    col_logo_left, col_logo_center, col_logo_right = st.columns([1, 2, 1])
-    with col_logo_center:
-        st.image(LOGO_FILE, width=210)
+    logo_b64 = base64.b64encode(Path(LOGO_FILE).read_bytes()).decode()
+    st.markdown(
+        f"""
+<div class="hero-logo-wrap">
+    <img src="data:image/png;base64,{logo_b64}" class="hero-logo">
+</div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 st.markdown(
     f"""
@@ -537,11 +528,11 @@ with col2:
 
     st.markdown(
         f"""
-        <div class="card">
-            <div class="label">{esc(streak['label'])}</div>
-            <div class="value">{esc(streak['value'])}</div>
-            <div class="sub">{esc(streak_sub)}</div>
-        </div>
+            <div class="card">
+                <div class="label">{esc(streak['label'])}</div>
+                <div class="value">{esc(streak['value'])}</div>
+                <div class="sub">{esc(streak_sub)}</div>
+            </div>
         """,
         unsafe_allow_html=True,
     )
@@ -584,13 +575,22 @@ if next_game:
     if countdown:
         st.markdown(
             f"""
-<div class="countdown-center">
-    <div class="countdown-big">
-        {countdown['days']} Days • {countdown['hours']} Hours • {countdown['minutes']} Minutes
+<div class="countdown-shell">
+    <div class="count-grid">
+        <div class="count-box">
+            <div class="count-num">{countdown['days']}</div>
+            <div class="count-lbl">Days</div>
+        </div>
+        <div class="count-box">
+            <div class="count-num">{countdown['hours']}</div>
+            <div class="count-lbl">Hours</div>
+        </div>
+        <div class="count-box">
+            <div class="count-num">{countdown['minutes']}</div>
+            <div class="count-lbl">Minutes</div>
+        </div>
     </div>
-    <div class="countdown-small">
-        Until tip-off
-    </div>
+    <div class="countdown-note">Until tip-off</div>
 </div>
             """,
             unsafe_allow_html=True,
