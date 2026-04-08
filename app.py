@@ -181,16 +181,6 @@ last_result = get_last_result(results_df)
 streak = get_streak(results_df)
 
 # -------------------------------------------------
-# Auto refresh every 60 seconds
-# -------------------------------------------------
-st.markdown(
-    """
-    <meta http-equiv="refresh" content="60">
-    """,
-    unsafe_allow_html=True,
-)
-
-# -------------------------------------------------
 # Global styling
 # -------------------------------------------------
 st.markdown(
@@ -598,32 +588,31 @@ st.markdown('<div class="section-heading">Previous Results</div>', unsafe_allow_
 
 if not results_df.empty:
     results_html = '<div class="results-grid">'
+
     for _, row in results_df.head(8).iterrows():
         result_class = "pill-win" if row["result"] == "W" else "pill-loss"
         result_word = "Win" if row["result"] == "W" else "Loss"
         date_str = row["date"].strftime("%d %b %Y")
 
-        results_html += f"""
-        <div class="result-card">
-            <div class="result-top">
-                <div class="result-opponent">vs {esc(row['opponent'])}</div>
-                <div class="result-date">{esc(date_str)}</div>
-            </div>
-            <div class="result-bottom">
-                <div class="{result_class}">{result_word}</div>
-                <div class="result-score">{esc(row['score_display'])}</div>
-            </div>
-        </div>
-        """
+        results_html += f"""<div class="result-card">
+<div class="result-top">
+<div class="result-opponent">vs {esc(row['opponent'])}</div>
+<div class="result-date">{esc(date_str)}</div>
+</div>
+<div class="result-bottom">
+<div class="{result_class}">{result_word}</div>
+<div class="result-score">{esc(row['score_display'])}</div>
+</div>
+</div>"""
 
     results_html += "</div>"
     st.markdown(results_html, unsafe_allow_html=True)
 else:
     st.markdown(
         """
-        <div class="empty-box">
-            No previous results found. Update results.csv.
-        </div>
+<div class="empty-box">
+No previous results found. Update results.csv.
+</div>
         """,
         unsafe_allow_html=True,
     )
