@@ -778,25 +778,55 @@ st.markdown(
 # -------------------------------------------------
 logo_component_html = ""
 if Path(LOGO_FILE).exists():
-    logo_path = Path(LOGO_FILE)
-    logo_b64 = base64.b64encode(logo_path.read_bytes()).decode()
-    logo_mime = get_mime_type(logo_path)
+    # Remove dark/black background from logo at runtime
+    try:
+        from PIL import Image
+        import numpy as np, io
+        img = Image.open(LOGO_FILE).convert("RGBA")
+        data = np.array(img)
+        r = data[:,:,0].astype(int)
+        g = data[:,:,1].astype(int)
+        b = data[:,:,2].astype(int)
+        brightness = r + g + b
+        # Flood-fill from edges to find only true background pixels
+        is_dark = brightness < 80
+        h, w = is_dark.shape
+        visited = np.zeros((h, w), dtype=bool)
+        stack = []
+        for x in range(w):
+            if is_dark[0, x]: stack.append((0, x))
+            if is_dark[h-1, x]: stack.append((h-1, x))
+        for y in range(h):
+            if is_dark[y, 0]: stack.append((y, 0))
+            if is_dark[y, w-1]: stack.append((y, w-1))
+        while stack:
+            y, x = stack.pop()
+            if y < 0 or y >= h or x < 0 or x >= w or visited[y, x] or not is_dark[y, x]:
+                continue
+            visited[y, x] = True
+            stack.extend([(y+1,x),(y-1,x),(y,x+1),(y,x-1)])
+        data[visited, 3] = 0
+        result = Image.fromarray(data)
+        buf = io.BytesIO()
+        result.save(buf, format="PNG")
+        logo_b64 = base64.b64encode(buf.getvalue()).decode()
+    except Exception:
+        logo_b64 = base64.b64encode(Path(LOGO_FILE).read_bytes()).decode()
+
     logo_component_html = f"""
     <style>
-    body{{margin:0;padding:0;background:#000000;display:flex;justify-content:center;}}
-    .logo-wrap{{display:flex;justify-content:center;padding:0;}}
+    body{{margin:0;padding:0;background:#000000;display:flex;justify-content:center;align-items:center;}}
+    .logo-wrap{{display:flex;justify-content:center;padding-top:2rem;}}
     .logo-wrap img{{
-        width:120px;
+        width:160px;
         max-width:60vw;
         display:block;
-        mix-blend-mode:lighten;
-        box-shadow:0 0 60px rgba(255,92,0,0.35),0 0 120px rgba(255,92,0,0.12);
-        border-radius:20px;
+        filter: drop-shadow(0 0 24px rgba(255,92,0,0.5)) drop-shadow(0 0 8px rgba(255,92,0,0.3));
     }}
     </style>
-    <div class="logo-wrap"><img src="data:{logo_mime};base64,{logo_b64}"></div>
+    <div class="logo-wrap"><img src="data:image/png;base64,{logo_b64}"></div>
     """
-    components.html(logo_component_html, height=148, scrolling=False)
+    components.html(logo_component_html, height=168, scrolling=False)
     logo_html = ""
 else:
     logo_html = ""
