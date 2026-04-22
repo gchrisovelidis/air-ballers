@@ -27,7 +27,7 @@ TIMEZONE = ZoneInfo("Europe/Athens")
 NEXT_GAME_FILE = "next_game.csv"
 RESULTS_FILE = "results.csv"
 PLAYERS_FILE = "players.csv"
-LOGO_FILE = "logo.png"
+LOGO_FILE = "logo_v2.png"
 IMAGES_DIR = Path("images")
 
 # -------------------------------------------------
