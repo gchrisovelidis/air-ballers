@@ -270,6 +270,7 @@ st.markdown(
         border-radius: 24px;
         display: block;
         box-shadow: 0 0 60px rgba(255,92,0,0.35), 0 0 120px rgba(255,92,0,0.12);
+        mix-blend-mode: lighten;
     }
 
     .hero-eyebrow {
