@@ -5,6 +5,7 @@ from zoneinfo import ZoneInfo
 
 import pandas as pd
 import streamlit as st
+import streamlit.components.v1 as components
 
 # -------------------------------------------------
 # Page config
@@ -940,7 +941,7 @@ st.markdown(
 )
 
 if not results_df.empty:
-    html = '<div class="results-grid">'
+    results_inner = ""
     for _, row in results_df.iterrows():
         is_win      = row["result"] == "W"
         card_cls    = "rc-win" if is_win else "rc-loss"
@@ -951,9 +952,9 @@ if not results_df.empty:
 
         watch_html = ""
         if youtube_url:
-            watch_html = f'<a href="{youtube_url}" target="_blank" rel="noopener noreferrer" class="watch-btn">▶ Watch</a>'
+            watch_html = f'<a href="{youtube_url}" target="_blank" rel="noopener noreferrer" class="watch-btn">&#9654; Watch</a>'
 
-        html += f"""
+        results_inner += f"""
         <div class="result-card {card_cls}">
           <div class="result-badge {badge_cls}">{badge_txt}</div>
           <div class="result-info">
@@ -964,8 +965,36 @@ if not results_df.empty:
           {watch_html}
         </div>
         """
-    html += "</div>"
-    st.markdown(html, unsafe_allow_html=True)
+
+    num_results = len(results_df)
+    results_height = max(100, num_results * 90 + 20)
+
+    components.html(
+        f"""
+        <style>
+        @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Barlow:wght@400;500&display=swap');
+        *{{margin:0;padding:0;box-sizing:border-box;}}
+        body{{background:transparent;}}
+        .results-grid{{display:grid;gap:0.6rem;}}
+        .result-card{{background:#111111;border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:0.95rem 1.15rem;display:flex;align-items:center;gap:1rem;position:relative;overflow:hidden;}}
+        .rc-win{{border-left:3px solid #22C55E;}}
+        .rc-loss{{border-left:3px solid #EF4444;}}
+        .result-badge{{font-family:'Barlow Condensed',sans-serif;font-size:1.35rem;font-weight:900;width:2.4rem;text-align:center;flex-shrink:0;}}
+        .rb-win{{color:#22C55E;}}
+        .rb-loss{{color:#EF4444;}}
+        .result-info{{flex:1;min-width:0;}}
+        .result-opponent{{font-family:'Barlow Condensed',sans-serif;font-size:1.08rem;font-weight:700;color:#ffffff;text-transform:uppercase;letter-spacing:0.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}}
+        .result-date{{font-size:0.79rem;color:#888888;margin-top:0.12rem;}}
+        .result-score{{font-family:'Barlow Condensed',sans-serif;font-size:1.45rem;font-weight:800;color:#ffffff;letter-spacing:0.03em;flex-shrink:0;}}
+        .watch-btn{{display:inline-flex;align-items:center;gap:0.3rem;padding:0.32rem 0.72rem;border-radius:999px;background:#181818;border:1px solid rgba(255,255,255,0.13);color:#bbbbbb;font-size:0.76rem;font-weight:700;text-decoration:none;flex-shrink:0;font-family:'Barlow Condensed',sans-serif;letter-spacing:0.06em;text-transform:uppercase;}}
+        .watch-btn:hover{{background:rgba(255,92,0,0.1);border-color:rgba(255,92,0,0.35);color:#FF7A2B;}}
+        @media(max-width:500px){{.watch-btn{{display:none;}}}}
+        </style>
+        <div class="results-grid">{results_inner}</div>
+        """,
+        height=results_height,
+        scrolling=False,
+    )
 else:
     st.markdown(
         '<div class="empty-box">No previous results found. Update results.csv.</div>',
@@ -981,7 +1010,7 @@ st.markdown(
 )
 
 if not players_df.empty:
-    html = '<div class="players-grid">'
+    players_inner = ""
     for _, row in players_df.iterrows():
         photo_name = str(row.get("photo", "")).strip()
         photo_html = ""
@@ -997,7 +1026,7 @@ if not players_df.empty:
             initials   = "".join([part[0] for part in str(row["name"]).split()[:2]]).upper()
             photo_html = f'<div class="player-initials">{esc(initials)}</div>'
 
-        html += f"""
+        players_inner += f"""
         <div class="player-card">
           <div class="player-photo-wrap">
             {photo_html}
@@ -1007,8 +1036,34 @@ if not players_df.empty:
           <div class="player-pos">{esc(row['position'])}</div>
         </div>
         """
-    html += "</div>"
-    st.markdown(html, unsafe_allow_html=True)
+
+    num_players = len(players_df)
+    # 4 cols: ceil(n/4) rows * ~220px per row
+    import math
+    roster_rows = math.ceil(num_players / 4)
+    roster_height = max(240, roster_rows * 230 + 20)
+
+    components.html(
+        f"""
+        <style>
+        @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Barlow:wght@400;500&display=swap');
+        *{{margin:0;padding:0;box-sizing:border-box;}}
+        body{{background:transparent;}}
+        .players-grid{{display:grid;grid-template-columns:repeat(4,1fr);gap:0.9rem;}}
+        .player-card{{background:#111111;border:1px solid rgba(255,255,255,0.07);border-radius:20px;padding:1.2rem 0.7rem 1rem;text-align:center;}}
+        .player-photo-wrap{{position:relative;display:inline-block;margin-bottom:0.85rem;}}
+        .player-photo{{width:88px;height:88px;border-radius:50%;object-fit:cover;display:block;border:2px solid rgba(255,255,255,0.13);background:#181818;}}
+        .player-initials{{width:88px;height:88px;border-radius:50%;border:2px solid rgba(255,255,255,0.13);background:#181818;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:1.7rem;font-weight:800;color:#FF5C00;}}
+        .player-num-badge{{position:absolute;bottom:-3px;right:-3px;background:#000000;border:1px solid rgba(255,255,255,0.13);color:#bbbbbb;font-family:'Barlow Condensed',sans-serif;font-size:0.74rem;font-weight:800;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;}}
+        .player-name{{font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:800;text-transform:uppercase;letter-spacing:0.05em;color:#ffffff;margin-bottom:0.18rem;}}
+        .player-pos{{font-size:0.76rem;color:#888888;font-weight:500;text-transform:uppercase;letter-spacing:0.1em;}}
+        @media(max-width:600px){{.players-grid{{grid-template-columns:repeat(2,1fr);}}}}
+        </style>
+        <div class="players-grid">{players_inner}</div>
+        """,
+        height=roster_height,
+        scrolling=False,
+    )
 else:
     st.markdown(
         '<div class="empty-box">No players found. Update players.csv.</div>',
