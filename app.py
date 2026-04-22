@@ -1104,7 +1104,7 @@ if not players_df.empty:
         .player-initials{{width:88px;height:88px;border-radius:50%;border:2px solid rgba(255,255,255,0.13);background:#181818;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:1.7rem;font-weight:800;color:#FF5C00;}}
         .player-num-badge{{position:absolute;bottom:-3px;right:-3px;background:#000000;border:1px solid rgba(255,255,255,0.13);color:#bbbbbb;font-family:'Barlow Condensed',sans-serif;font-size:0.74rem;font-weight:800;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;}}
         .player-name{{font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:800;text-transform:uppercase;letter-spacing:0.05em;color:#ffffff;margin-bottom:0.18rem;}}
-        .player-pos{{font-size:0.76rem;color:#888888;font-weight:500;text-transform:uppercase;letter-spacing:0.1em;}}
+        .player-pos{{display:inline-block;background:rgba(255,92,0,0.12);border:1px solid rgba(255,92,0,0.25);color:#FF7A2B;font-family:'Barlow Condensed',sans-serif;font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;padding:0.18rem 0.6rem;border-radius:999px;}}
         @media(max-width:600px){{.players-grid{{grid-template-columns:repeat(2,1fr);}}}}
         </style>
         <div class="players-grid">{players_inner}</div>
