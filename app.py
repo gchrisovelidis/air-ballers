@@ -255,7 +255,7 @@ st.markdown(
     /* ---- HERO ---- */
     .hero-wrap {
         text-align: center;
-        padding: 2.5rem 0 1.5rem;
+        padding: 0 0 1.5rem;
     }
 
     .hero-logo-wrap {
@@ -776,12 +776,30 @@ st.markdown(
 # -------------------------------------------------
 # Hero
 # -------------------------------------------------
-logo_html = ""
+logo_component_html = ""
 if Path(LOGO_FILE).exists():
     logo_path = Path(LOGO_FILE)
     logo_b64 = base64.b64encode(logo_path.read_bytes()).decode()
     logo_mime = get_mime_type(logo_path)
-    logo_html = f'<div class="hero-logo-wrap"><img src="data:{logo_mime};base64,{logo_b64}" class="hero-logo"></div>'
+    logo_component_html = f"""
+    <style>
+    body{{margin:0;padding:0;background:#000000;display:flex;justify-content:center;}}
+    .logo-wrap{{display:flex;justify-content:center;padding:0;}}
+    .logo-wrap img{{
+        width:120px;
+        max-width:60vw;
+        display:block;
+        mix-blend-mode:lighten;
+        box-shadow:0 0 60px rgba(255,92,0,0.35),0 0 120px rgba(255,92,0,0.12);
+        border-radius:20px;
+    }}
+    </style>
+    <div class="logo-wrap"><img src="data:{logo_mime};base64,{logo_b64}"></div>
+    """
+    components.html(logo_component_html, height=148, scrolling=False)
+    logo_html = ""
+else:
+    logo_html = ""
 
 record_html = ""
 if record["wins"] + record["losses"] > 0:
@@ -799,7 +817,6 @@ if record["wins"] + record["losses"] > 0:
 st.markdown(
     f"""
     <div class="hero-wrap">
-      {logo_html}
       <div class="hero-eyebrow">{esc(LEAGUE_NAME)}</div>
       <div class="hero-title">Air <em>Ballers</em></div>
       <div class="hero-divider"></div>
